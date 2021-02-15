@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+  <record id="view_form_pos_promocion" model="ir.ui.view">
+      <field name="name">view.form.pos_promociones.pos_promocion</field>
+      <field name="model">pos_promociones.promocion</field>
+      <field name="arch" type="xml">
+          <form string="Promociones">
+              <sheet>
+                  <div class="oe_title">
+                      <h1>
+                          <field name="name"/>
+                      </h1>
+                  </div>
+                  <group>
+                      <group>
+                        <!-- vista -->
+                          <field name="tipo_select"/>
+                          <field name="fecha_inicio"/>
+                          <field name="fecha_fin"/>
+                          <field name="autorizado"/>
+                          <field name="comentario"/>
+                      </group>
+                  </group>
+                  <group>
+                    <field name="cliente_ids"/>
+                    <field name="productos_ids"/>
+                    <field name="condicion_promocion_ids">
+                      <tree editable="botom">
+                        <field name="a_partir"/>
+                        <field name="promocion"/>
+                        <field name="porcentaje"/>
+                      </tree>
+                    </field>
+                    <field name="productos_regalo_ids"/>
+                  </group>
+              </sheet>
+          </form>
+      </field>
+  </record>
+
+  <!-- <record id="pos_promociones_view_search" model="ir.ui.view">
+      <field name="name">pos_promociones.promocion.search</field>
+      <field name="model">pos_promociones.promocion</field>
+      <field name="arch" type="xml">
+          <search string="Promociones">
+              <field name="name"/>
+              <field name="fecha_inicio"/>
+              <field name="fecha_fin"/>
+          </search>
+      </field>
+  </record> -->
+
+  <record id="action_pos_promociones1" model="ir.actions.act_window">
+    <field name="name">Promociones</field>
+    <field name="res_model">pos_promociones.promocion</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain"></field>
+    <field name="context"></field>
+    <!-- <field name="search_view_id" ref="quemen_promociones_view_search"/> -->
+    <field name="help" type="html">
+      <p class="oe_view_nocontent_create">
+       Click para crear una promo
+      </p>
+    </field>
+  </record>
+  <!-- <
+
+  /> -->
+
+    <menuitem
+        id="menu_pos_promocion"
+        name="Promociones"
+        parent="point_of_sale.menu_point_root"
+        sequence="135"/>
+
+    <menuitem
+        id="menu_pos_promocion_submenu"
+        name="Promocion"
+        parent="menu_pos_promocion"
+        action="action_pos_promociones1"
+        sequence="25"/>
+
+
+
+  </data>
+</odoo>
