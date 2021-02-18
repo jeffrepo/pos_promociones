@@ -25,14 +25,23 @@
                   <group>
                     <field name="cliente_ids"/>
                     <field name="productos_ids"/>
-                    <field name="condicion_promocion_ids">
+                    <field name="condicion_promocion_ids" attrs="{'invisible': [('tipo_select','=', 'desc')]}">
                       <tree editable="botom">
                         <field name="a_partir"/>
                         <field name="promocion"/>
                         <field name="porcentaje"/>
                       </tree>
                     </field>
-                    <field name="productos_regalo_ids"/>
+                  </group>
+                  <group>
+                    <field name="productos_regalo_ids" attrs="{'invisible': [('tipo_select','=', 'desc')]}"/>
+                    <field name="aplicar" attrs="{'invisible': [('tipo_select','=', 'promo')]}"/>
+                    <field name="condicion_descuento_ids" attrs="{'invisible': [('tipo_select','=', 'promo')]}">
+                      <tree editable="botom">
+                        <field name="partir_de"/>
+                        <field name="descuento"/>
+                      </tree>
+                    </field>
                   </group>
               </sheet>
           </form>
