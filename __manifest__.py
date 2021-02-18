@@ -18,9 +18,11 @@
 
     'data': [
         'views/pos_promocion_views.xml',
-
+        'views/pos_config_views.xml',
+        'views/templates.xml'
     ],
     'qweb': [
+        'static/src/xml/pos.xml'
     ],
     'installable': True,
     'application': True,

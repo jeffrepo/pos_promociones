@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="PedidoLinea">
+      <t t-if="widget.pos.get_order() &amp;&amp; widget.pos.get_order().pedido_linea">
+        <div class='control-button js_promocioneslinea'>
+          <i class='fa fa-shopping-bag' /> Pedido de linea
+        </div>
+      </t>
+      <t t-if="widget.pos.get_order() &amp;&amp; !widget.pos.get_order().pedido_linea">
+      <div style="color:red" class='control-button js_promocioneslinea '>
+        <i class='fa fa-shopping-bag'/> Pedido de linea seleccionado
+      </div>
+      </t>
+    </t>
+
+    <t t-name="PedidoEspecial">
+        <t t-if="widget.pos.get_order() &amp;&amp; widget.pos.get_order().pedido_especial">
+          <div class="control-button js_promocionesEspeciales">
+            <i class='fa fa-shopping-bag'/> Pedido especial
+          </div>
+        </t>
+        <t t-if="widget.pos.get_order() &amp;&amp; !widget.pos.get_order().pedido_especial">
+          <div style="color:red" class='control-button js_promocionesEspeciales'>
+            <i class='fa fa-shopping-bag'/> Pedido especial seleccionado
+          </div>
+        </t>
+    </t>
+
+
+
+</templates>

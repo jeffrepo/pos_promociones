@@ -14,9 +14,11 @@ class PosPromociones(models.Model):
     comentario = fields.Char("Comentario")
     tipo_select = fields.Selection(selection=[('promo','Promocion'), ('desc','Descuento')], string='Tipo')
     cliente_ids = fields.Many2many('res.partner', 'pos_promociones_rel', string="Clientes")
-    productos_ids = fields.Many2many('product.product','pos_promociones_tipo_rel', string="Productos")
+    productos_ids = fields.Many2many('product.product','pos_promociones_tipo_rel', string="Productos promocion")
     condicion_promocion_ids = fields.One2many('pos_promociones.promocion.lineas', 'promo_id', string="Condicion promocion")
-    productos_regalo_ids = fields.Many2many('product.product','pos_promociones_regalo_tipo_rel', string="Productos")
+    condicion_descuento_ids = fields.One2many('pos_promociones.promocion.descuento', 'descuento_id', string="Condicion descuento")
+    productos_regalo_ids = fields.Many2many('product.product','pos_promociones_regalo_tipo_rel', string="Productos beneficio")
+    aplicar = fields.Selection(selection=[('dinero', 'Dinero'), ('uni', 'Unidades')])
 
 
 class PosPromocionesLinea(models.Model):
@@ -26,3 +28,10 @@ class PosPromocionesLinea(models.Model):
     a_partir = fields.Integer('a partir')
     promocion = fields.Integer('Promocion')
     porcentaje = fields.Float('Porcentaje')
+
+class PosPromocionesDescuento(models.Model):
+    _name = "pos_promociones.promocion.descuento"
+
+    descuento_id = fields.Many2one('pos_promociones.promocion')
+    partir_de = fields.Integer('A partir de')
+    descuento = fields.Integer('Descuento')
