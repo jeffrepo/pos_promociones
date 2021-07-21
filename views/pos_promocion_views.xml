@@ -17,12 +17,15 @@
                         <!-- vista -->
                           <field name="tipo_select"/>
                           <field name="fecha_inicio"/>
+                          <field name="hora_inicio" widget="float_time"/>
                           <field name="fecha_fin"/>
+                          <field name="hora_final" widget="float_time"/>
                           <field name="autorizado"/>
                           <field name="comentario"/>
                       </group>
                   </group>
                   <group>
+                    <field name="tienda_ids"/>
                     <field name="cliente_ids"/>
                     <field name="productos_ids"/>
                     <field name="condicion_promocion_ids" attrs="{'invisible': [('tipo_select','=', 'desc')]}">
