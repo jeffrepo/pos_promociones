@@ -17,9 +17,11 @@
     'depends': ['stock','base','point_of_sale', 'purchase', 'sale', 'stock', 'pos_sale'],
 
     'data': [
+        'security/ir.model.access.csv',
         'views/pos_promocion_views.xml',
         'views/pos_config_views.xml',
-        'views/templates.xml'
+        'views/templates.xml',
+        'views/pos_config_extra_views.xml',
     ],
     'qweb': [
         'static/src/xml/pos.xml'
