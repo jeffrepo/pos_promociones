@@ -14,7 +14,7 @@ class PosPromociones(models.Model):
     hora_final = fields.Float("Hora fin")
     autorizado = fields.Char("Autorizado")
     comentario = fields.Char("Comentario")
-    tipo_select = fields.Selection(selection=[('promo','Promocion'), ('desc','Descuento')], string='Tipo')
+    tipo_select = fields.Selection(selection=[('prom','Promocion'), ('desc','Descuento')], string='Tipo')
     tienda_ids = fields.Many2many('pos.config','pos_promociones_tienda',string="Tiendas")
     cliente_ids = fields.Many2many('res.partner', 'pos_promociones_rel', string="Clientes")
     productos_ids = fields.Many2many('product.product','pos_promociones_tipo_rel', string="Productos promocion")
