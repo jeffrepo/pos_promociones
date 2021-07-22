@@ -218,10 +218,17 @@ screens.ActionpadWidget.include({
 
                             if (condicion[j].a_partir == 1 && condicion[j].promocion == 1) {
                               calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
+                              console.log("calculo repetir 1");
+                              console.log(calculo_repetir);
+                              
                             }else {
-                              calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir - condicion[j].promocion) ).toFixed(2);
-                            }
+                              console.log("calculo repetir else");
+                              calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir) ).toFixed(2);
+                              console.log(calculo_repetir);
 
+                            }
+                            console.log("Fuera de las condiciones calculo repetir");
+                            console.log(calculo_repetir);
                             promos_llevar = Math.trunc(calculo_repetir);
 
                             diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
@@ -252,8 +259,7 @@ screens.ActionpadWidget.include({
                 if (!(l.product.id in diccionario_productos_regalo)) {
                   diccionario_productos_regalo[l.product.id]={'id': l.product.id, 'cantidad': 0, 'total':0, 'precio_unitario': l.get_unit_price()};
                 }
-                console.log("l.get_base_price");
-                console.log(l.get_base_price());
+
                 diccionario_productos_regalo[l.product.id]['cantidad']+= l.get_quantity();
                 diccionario_productos_regalo[l.product.id]['total']+=l.get_base_price();
 
@@ -415,7 +421,7 @@ screens.ActionpadWidget.include({
 
       });
 
-
+      console.log(diccionario_productos);
       if ( Object.keys(diccionario_productos).length > 0) {
         for (const [key, value] of  Object.entries(diccionario_productos) ) {
           lista_regalos = value['listado_regalos'];
@@ -428,6 +434,10 @@ screens.ActionpadWidget.include({
             for (const [key0, value0] of Object.entries(diccionario_productos_regalo)) {
 
                 if (lista_regalos.indexOf(key0)) {
+                  console.log("value['promos_llevar']");
+                  console.log(value['promos_llevar']);
+                  console.log("value0['cantidad']");
+                  console.log(value0['cantidad']);
                   if (value['promos_llevar'] > 0 && value['promos_llevar'] <= value0['cantidad']) {
                     var restar_promos_llevar = value['promos_llevar'];
 
@@ -444,6 +454,7 @@ screens.ActionpadWidget.include({
                     var restar_promos_llevar = value['promos_llevar'];
 
                     resta = value0['total'] - (value['cantidad_regalo']*value['promos_llevar']);
+                    console.log("");
                     order.descuento += ( (value0['precio_unitario']* (value['porcentaje']/100) ) * value['promos_llevar']);
                     value['cantidad'] = 0;
 
