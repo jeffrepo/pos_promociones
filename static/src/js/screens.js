@@ -182,7 +182,7 @@ screens.ActionpadWidget.include({
 								hora_fina = horas[1];
 
 							}
-              
+
               if ((hora_minuto1 >= hora_inic ) && (hora_minuto1 <= hora_fina)) {
 
                 producto_beneficio = promociones[i].productos_regalo_ids;
@@ -306,7 +306,7 @@ screens.ActionpadWidget.include({
 
       } //fin de verificación del tamaño del diccionario_productos
 
-      var producto_descuento= db.get_product_by_id(30);
+      var producto_descuento= db.get_product_by_id(47);
 
       if (order.descuento > 0) {
 
