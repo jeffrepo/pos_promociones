@@ -185,10 +185,9 @@ screens.ActionpadWidget.include({
 
   							}
 
-                if ((hora_minuto1 >= hora_inic ) && (hora_minuto1 <= hora_fina)) {
+							}
 
-                  producto_beneficio = promociones[i].productos_regalo_ids;
-                  productos_promocion = promociones[i].productos_ids;
+              if ((hora_minuto1 >= hora_inic ) && (hora_minuto1 <= hora_fina)) {
 
                   if ( (productos_promocion.includes(l.product.id) ) ) {
 
@@ -473,7 +472,7 @@ screens.ActionpadWidget.include({
               console.log(value1['promos_llevar']);
               precio_final = value1['precio_unitario'] * (value1['descuento']/100)
               order.descuento += ( precio_final * value1['']);
-              
+
 
               value1['promos_llevar'] -= restar_promos_llevar;
 
@@ -530,9 +529,13 @@ screens.ActionpadWidget.include({
         }
       }//Fin de la verificación del tamaño del diccionario_productos_descuento
 
+<<<<<<< HEAD
       console.log("Asi va el dicccionario de descuentos");
       console.log(diccionario_productos_descuento);
       var producto_descuento= db.get_product_by_id(30);
+=======
+      var producto_descuento= db.get_product_by_id(47);
+>>>>>>> 9fd675c151740bba2c62e57159edfc27c09167ec
 
       if (order.descuento > 0) {
 
