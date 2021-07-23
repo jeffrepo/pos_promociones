@@ -11,6 +11,9 @@
               <field name="pedido_especial"/>
               <field name="pedido_linea"/>
             </group>
+            <group>
+              <field name="producto_descuento_id"/>
+            </group>
           </field>
         </field>
     </record>

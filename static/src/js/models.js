@@ -452,38 +452,6 @@ models.Orderline = models.Orderline.extend({
 			this.set('productos_anteriores', productos_anteriores);
 		},
 
-		mostrar_popup_promociones : function (productos_promocion, l, order, suma_precio, cantidad_promocion, cantidad_regalo, producto, mostrar_ventana) {
-			var self = this;
-			var precio_descuento = 0;
-			console.log("De lo que sea");
-			suma_precio = l.get_base_price();
-
-			self.pos.gui.show_popup('selection',{
-				title: "Productos de regalo",
-				list: productos_promocion,
-				confirm: function(producto_item) {
-
-					var cantidad_regalo = producto_item.lst_price * cantidad_promocion;
-					var precio_real = suma_precio + cantidad_regalo;
-
-
-					precio_descuento += suma_precio;
-
-					var f_descuento = ( (100 - (precio_descuento * 100) / precio_real) ).toFixed(10);
-
-					order.add_product(producto_item, { quantity: cantidad_promocion, discount: f_descuento });
-
-					l.set_discount(f_descuento);
-					l.set_promocion_aplicada(true);
-
-				},
-				cancel: function(){
-						 // user chose nothing
-				}
-
-			});
-			return true
-		},
 
 		get_hora : function (hora_inicio, hora_final) {
 			// Check sign of given number
@@ -548,105 +516,15 @@ models.Orderline = models.Orderline.extend({
 			return [times, times1];
 		},
 
-		get_buscarProductoDescuento: function(producto, promociones){
-			var order = this.pos.get_order();
-			var db = this.pos.db;
-			var condicion_descuento_ids= false;
-			var producto_beneficio = false;
-			var self=this;
-			var suma_cantidades = 0;
-			var suma_precio = 0;
-			var condicion_descuento = 0;
-			var resta=0;
-			var f_descuento=0;
-			var producto_precio = 0;
-			var calculo_total=0;
-			var today = new Date();
-	    var hora = today.getHours();
-	    var minuto = today.getMinutes();
-			if( minuto.toString().length == 1){
-	        minuto = '0'+minuto
-	    }
-			var hora_minuto = today.getHours()+':'+today.getMinutes();
-			var hora_minuto1 = moment(hora_minuto, ["h:mm A"]).format("HH:mm");
-			if (hora_minuto1 >= '12:59') {
-				const timeString12hrs0 = new Date('1970-01-01T' + hora_minuto + 'Z')
-				.toLocaleTimeString({},{timeZone:'UTC', hour12:true, hour:'numeric', minute:'numeric'});
-				hora_minuto1 = timeString12hrs0;
-			}
-
-			order.get_orderlines().forEach(function(o) {
-				producto_precio = o.get_base_price();
-			});
-
-			var id_product = producto.id;
-			for (var i = 0; i < promociones.length; i++) {
-				var productos = promociones[i].productos_ids;
-				var horas = self.get_hora(promociones[i].hora_inicio, promociones[i].hora_final);
-
-				for (var j = 0; j < productos.length; j++) {
-					var id_productos = productos[j];
-
-					if (producto.id == id_productos) {
-
-						order.get_orderlines().forEach(function(l) {
-
-							var condicion = promociones[i].pos_condicion_descuento_ids;
-							suma_precio = l.get_base_price();
-
-							for (var k = 0; k < condicion.length; k++) {
-								condicion[k];
-								condicion_descuento = condicion[k].descuento;
-
-
-								if (producto.id == l.product.id) {
-									suma_cantidades = l.get_quantity();
-
-									if (suma_cantidades >= condicion[k].partir_de) {
-
-										var hora_inicio, hora_final;
-										for (var m = 0; m < horas.length; m++) {
-											horas[m]
-
-											hora_inicio = horas[0];
-											hora_final = horas[1];
-										}
-
-										if ((hora_minuto1 >= hora_inicio) && (hora_minuto1 <= hora_final) ) {
-
-											resta = suma_precio - condicion_descuento;
-											f_descuento = (resta * 100)/suma_precio;
-											calculo_total = producto_precio*(f_descuento/100);
-
-										}
-
-									}
-
-								}
-
-							}
-
-						});
-
-					}
-
-
-
-				}
-
-			}
-
-			return [condicion_descuento_ids, producto_beneficio]
-		},
-
 		set_quantity: function(quantity, keep_price){
 			var self = this;
 
 			_super_order_line.set_quantity.apply(this,arguments);
 			this.trigger('change', this);
 
-			self.get_buscarProductoPromocion(self.product, this.pos.promocion);
-			self.get_buscarProductoDescuento(self.product, this.pos.promocion);
+			console.log("No hay problema");
+			//self.get_buscarProductoPromocion(self.product, this.pos.promocion);
+			//self.get_buscarProductoDescuento(self.product, this.pos.promocion);
 
 		},
 })
@@ -667,9 +545,7 @@ models.Order = models.Order.extend({
 			this.set_descuento(0);
 			this.descuento=0;
 	},
-
-
-
+	
 	get_descuento: function(){
 		return this.get('descuento');
 	},
@@ -688,28 +564,69 @@ models.Order = models.Order.extend({
 	},
 
 
-	// add_product: function(product, options){
-	//
-	// 	var self = this;
-	// 	var suma_productos =0;
-	// 	var today = new Date();
-  //   var hora = today.getHours();
-  //   var minuto = today.getMinutes();
-  //   if( minuto.toString().length == 1){
-  //       minuto = '0'+minuto
-  //   }
-	//
-	// 	var order = this.pos.get_order();
-	//
-	// 	var new_add_product = _super_order.add_product.apply(this,arguments);
-	// 	self.get_buscarProductoPromocion(product, this.pos.promocion);
-	// 	self.get_buscarProductoDescuento(product, this.pos.promocion);
-	//
-	// 	console.log("Clic en add_product");
-	//
-	//
-	// 	return false;
-	// },
+
+	get_hora : function (hora_inicio, hora_final) {
+		// Check sign of given number
+		var sign = (hora_inicio >= 0) ? 1 : -1;
+		var sign1 = (hora_final >= 0) ? 1 : -1;
+
+		// Set positive value of number of sign negative
+		hora_inicio = hora_inicio * sign;
+		hora_final = hora_final * sign1;
+
+		// Separate the int from the decimal part
+		var hour = Math.floor(hora_inicio);
+		var hour1 = Math.floor(hora_final);
+
+		var decpart = hora_inicio - hour;
+		var decpart1 = hora_final - hour1;
+
+		var min = 1 / 60;
+
+		// Round to nearest minute
+		decpart = min * Math.round(decpart / min);
+		decpart1 = min * Math.round(decpart1 / min);
+
+		var minute = Math.floor(decpart * 60) + '';
+		var minute1 = Math.floor(decpart1 * 60) + '';
+
+		// Add padding if need
+		if (minute.length < 2) {
+		minute = '0' + minute;
+		}
+
+		if (minute1.length < 2) {
+			minute1 = '0' + minute1;
+		}
+
+		// Add Sign in final result
+		sign = sign == 1 ? '' : '-';
+		sign1 = sign1 == 1 ? '' : '-';
+
+		// Concate hours and minutes
+		var hora0, hora1;
+		hora0 = sign + hour + ':' + minute;
+		hora1 = sign1 + hour1 + ':' + minute1;
+
+		var times = moment(hora0, ["h:mm A"]).format("HH:mm");
+
+
+		// if (times > '11:59') {
+		// 	const timeString12hrs = new Date('1970-01-01T' + hora0 + 'Z')
+		// 	.toLocaleTimeString({},{timeZone:'UTC', hour12:true, hour:'numeric', minute:'numeric'});
+		// 	times = timeString12hrs;
+		// }
+
+		var times1 = moment(hora1, ["h:mm A"]).format("HH:mm");
+
+		// if (times1 >= '11:59') {
+		// 	const timeString12hrs0 = new Date('1970-01-01T'+ hora1 + 'Z')
+		// 	.toLocaleTimeString({},{timeZone:'UTC', hour12:true, hour:'numeric', minute:'numeric'});
+		// 	times1 = timeString12hrs0;
+		// }
+
+		return [times, times1];
+	},
 
 
 
