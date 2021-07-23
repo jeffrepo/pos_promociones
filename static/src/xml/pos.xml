@@ -27,4 +27,10 @@
         </t>
     </t>
 
+    <t t-name="ButtonPromocion">
+      <div class="control-button js_promocionesEspeciales">
+        <i class='fa fa-shopping-bag'/> Calcular promocion
+      </div>
+    </t>
+
 </templates>

@@ -14,3 +14,5 @@ class PosConfig(models.Model):
 
     pedido_especial = fields.Boolean(string="Pedido especial")
     pedido_linea = fields.Boolean(string="Pedido de linea")
+
+    producto_descuento_id = fields.Many2one('product.product', string="Producto descuento")
