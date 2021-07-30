@@ -19,79 +19,96 @@ models.load_models({
 			self.promocion = [];
 			var promoDescuento=[];
 			var promoPromocion=[];
+			// var promocion_i = false,
+			var tiendas = false;
 			//Recorrer "promocion", para obtener valores como el id de la tienda, obtener la fecha de la promocion
-			for (var i = 0; i < promocion.length; i++) {
 
-				promocion[i];
-				promocion[i]['pos_condicion_promocion_ids']=[];
-				promocion[i]['pos_condicion_descuento_ids']=[];
-				var tiendas = promocion[i].tienda_ids;
-				for (var j = 0; j < tiendas.length; j++) {
-					tiendas[j];
-					if (self.config.id == tiendas[j]) {
-						var validation_date = new Date();
+			promocion.forEach(function(pos_promocion){
 
-						var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY")
+				pos_promocion['pos_condicion_promocion_ids']=[];
+				pos_promocion['pos_condicion_descuento_ids']=[];
 
-						var fecha_promo_in = promocion[i].fecha_inicio;
-						var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY")
+				tiendas = pos_promocion.tienda_ids;
 
-						var fecha_promo_fin = promocion[i].fecha_fin;
-						var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY")
-						console.log("fecha_sesion0");
-						console.log(fecha_sesion0);
-						console.log("fecha_promo_in0");
-						console.log(fecha_promo_in0);
-						console.log("fecha_promo_fin0");
-						console.log(fecha_promo_fin0);
-						if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0)){
+				if (tiendas.includes(self.config.id) ) {
 
-							var promocion_i = promocion[i];
+					var validation_date = new Date();
+
+					var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY")
+
+					var fecha_promo_in = pos_promocion.fecha_inicio;
+					var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY")
+
+					var fecha_promo_fin = pos_promocion.fecha_fin;
+					var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY")
+
+					if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0)){
+						var posicion = pos_promocion;
+						var promocion_i = pos_promocion;
+
+						if (promocion_i.tipo_select == 'promo') {
+
 							var domain = [['id', 'in', promocion_i.condicion_promocion_ids]]
 							var fields = ['promo_id', 'a_partir', 'promocion', 'porcentaje'];
 
 							rpc.query({
-	                model: 'pos_promociones.promocion.lineas',
-	                method: 'search_read', //siempre se queda
-	                args: [domain, fields], //parametrso y campos
-	            },{
-	                timeout: 3000,
-	                shadow: true,
-	            }).then(function (promocionesLineas) {
+									model: 'pos_promociones.promocion.lineas',
+									method: 'search_read', //siempre se queda
+									args: [domain, fields], //parametrso y campos
+							},{
+									timeout: 3000,
+									shadow: true,
+							}).then(function (promocionesLineas) {
+
 									if(promocionesLineas){
+
 										for (var p = 0; p < promocionesLineas.length; p++) {
 											promocionesLineas[p];
 											promocion_i['pos_condicion_promocion_ids'].push(promocionesLineas[p]);
 										}
+
 									}
+
+
 							});
-							var domain=[['id', 'in', promocion_i.condicion_descuento_ids]]
-							var fields=['descuento_id', 'partir_de', 'descuento']
+
+						}else{
+
+							var domain1=[['id', 'in', promocion_i.condicion_descuento_ids]]
+							var fields1=['descuento_id', 'partir_de', 'descuento']
+
 							rpc.query({
 								model:'pos_promociones.promocion.descuento',
 								method:'search_read',
-								args: [domain, fields]
+								args: [domain1, fields1]
 							},{
-								timeout:3000,
+								timeout: 3000,
 								shadow: true,
 							}).then(function (promocionesDescuento){
+
 								if(promocionesDescuento){
 									for (var pD = 0; pD < promocionesDescuento.length; pD++) {
 										promocionesDescuento[pD];
 										promocion_i['pos_condicion_descuento_ids'].push(promocionesDescuento[pD]);
+
+
 									}
 
-
 								}
+
 							});
-							self.promocion.push(promocion[i]); //se agrega el listado de promociones a self
-							console.log("Self.promocion");
-							console.log(self.promocion);
 
 						}
-					}
+
+						self.promocion.push(promocion_i); //se agrega el listado de promociones a self
+
+						}
+
 				}
-			}
+
+			});
+			console.log("Self.promocion");
+			console.log(self.promocion);
 		},
 
 	})
@@ -522,7 +539,7 @@ models.Orderline = models.Orderline.extend({
 			_super_order_line.set_quantity.apply(this,arguments);
 			this.trigger('change', this);
 
-			console.log("No hay problema");
+			
 			//self.get_buscarProductoPromocion(self.product, this.pos.promocion);
 			//self.get_buscarProductoDescuento(self.product, this.pos.promocion);
 
@@ -545,7 +562,7 @@ models.Order = models.Order.extend({
 			this.set_descuento(0);
 			this.descuento=0;
 	},
-	
+
 	get_descuento: function(){
 		return this.get('descuento');
 	},
