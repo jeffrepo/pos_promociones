@@ -14,7 +14,6 @@ var PedidoEspecial = screens.ActionButtonWidget.extend({
         var order = this.pos.get_order();
         var gui = this.pos.gui;
 
-
         order.pedido_especial = !order.pedido_especial;
 
         var set_especial = this.pos.set_pedidoEspecial(order.pedido_especial);
@@ -136,6 +135,376 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     return [times, times1];
   },
 
+  get_tipo_descuento : function(){
+    var self = this;
+    var order = this.pos.get_order();
+    var gui = this.pos.gui;
+    var db = this.pos.db;
+    var producto_regalo_id = this.pos.config.producto_descuento_id;
+    var diccionario_productos_descuento={}
+    var promociones = false;
+    promociones = self.pos.promocion;
+
+    //--------------Variable para descuento-----------------------------------
+		var diccionario_productos_descuento={}, producto_beneficio0=false, productos_promocion0=0, condicion=false;
+		var calculo_repetir0= 0, promos_llevar0=0, precio_final=0, cliente=false, horas=false, clientes=false;
+    cliente = order.attributes.client.id;
+
+    var today = new Date();
+		var hora = today.getHours();
+		var minuto = today.getMinutes();
+		if( minuto.toString().length == 1){
+				minuto = '0'+minuto
+		}
+
+		var hora_minuto = today.getHours()+':'+minuto;
+		var hora_minuto1 = moment(hora_minuto, ["h:mm A"]).format("HH:mm");
+
+    order.get_orderlines().forEach(function(l) {
+
+      for (var i = 0; i < promociones.length; i++) {
+
+        if (promociones[i].tipo_select == 'desc') {
+          horas = self.get_hora(promociones[i].hora_inicio, promociones[i].hora_final);
+
+          var validation_date = new Date();
+
+          var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY");
+
+          var fecha_promo_in = promociones[i].fecha_inicio;
+          var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY");
+
+          var fecha_promo_fin = promociones[i].fecha_fin;
+          var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY");
+
+          var hora_inic, hora_fina;
+
+          for (var n = 0; n < horas.length; n++) {
+            horas[n];
+            hora_inic = horas[0];
+            hora_fina = horas[1];
+          }
+
+
+          if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 != fecha_promo_fin0)){
+
+            if ( (hora_minuto1 >= hora_inic )){
+
+              clientes = promociones[i].cliente_ids;
+
+              productos_promocion0 = promociones[i].productos_ids;
+
+              if (clientes.includes(cliente)) {
+
+                if ( productos_promocion0.includes(l.product.id)) {
+
+                  if (!(l.product.id in diccionario_productos_descuento)) {
+                    diccionario_productos_descuento[l.product.id]={
+                      'id':l.product.id,
+                      'tipo_descuento': false,
+                      'cantidad': 0,
+                      'precio_unitario': l.get_unit_price(),
+                      'promos_llevar':0,
+                      'total':0,
+                      'descuento':0,
+                      'cantidad_regalo':0,
+                      'cantidad_descuento':0,
+                      'n_promocion': promociones[i].id,
+                    };
+                  }
+
+                  diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
+                  diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
+                  condicion = promociones[i].pos_condicion_descuento_ids;
+
+                }
+
+              }
+              else if (clientes.length <= 0) {
+
+                if ( productos_promocion0.includes(l.product.id)) {
+
+                  if (!(l.product.id in diccionario_productos_descuento)) {
+
+                    diccionario_productos_descuento[l.product.id]={
+  										'id':l.product.id,
+  										'tipo_descuento': false,
+  										'cantidad': 0,
+  										'precio_unitario': l.get_unit_price(),
+  										'promos_llevar':0,
+  										'total':0,
+  										'descuento':0,
+  										'cantidad_regalo':0,
+  										'cantidad_descuento':0
+  									};
+
+                  }
+
+                  diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
+  								diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
+  								condicion = promociones[i].pos_condicion_descuento_ids;
+
+                }
+
+              }
+
+            }
+
+          }
+          else if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 == fecha_promo_fin0)) {
+
+            if ( (hora_minuto1 <= hora_fina) ) {
+
+              clientes = promociones[i].cliente_ids;
+
+              productos_promocion0 = promociones[i].productos_ids;
+
+              if (clientes.includes(cliente)) {
+
+                if ( productos_promocion0.includes(l.product.id)) {
+
+                  if (!(l.product.id in diccionario_productos_descuento)) {
+                    diccionario_productos_descuento[l.product.id]={
+                      'id':l.product.id,
+                      'tipo_descuento': false,
+                      'cantidad': 0,
+                      'precio_unitario': l.get_unit_price(),
+                      'promos_llevar':0,
+                      'total':0,
+                      'descuento':0,
+                      'cantidad_regalo':0,
+                      'cantidad_descuento':0,
+                      'n_promocion': promociones[i].id,
+                    };
+                  }
+
+                  diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
+                  diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
+                  condicion = promociones[i].pos_condicion_descuento_ids;
+
+                }
+
+              }
+
+              else if (clientes.length <= 0) {
+
+                if ( productos_promocion0.includes(l.product.id)) {
+
+                  if (!(l.product.id in diccionario_productos_descuento)) {
+
+                    diccionario_productos_descuento[l.product.id]={
+  										'id':l.product.id,
+  										'tipo_descuento': false,
+  										'cantidad': 0,
+  										'precio_unitario': l.get_unit_price(),
+  										'promos_llevar':0,
+  										'total':0,
+  										'descuento':0,
+  										'cantidad_regalo':0,
+  										'cantidad_descuento':0
+  									};
+
+                  }
+
+                  diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
+  								diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
+  								condicion = promociones[i].pos_condicion_descuento_ids;
+
+                }
+
+              }
+
+
+            }
+
+          }
+
+
+        }
+
+      }
+
+    });
+
+    return diccionario_productos_descuento;
+  },
+
+  get_tipo_promocion : function(){
+    var self = this;
+    var order = this.pos.get_order();
+    var gui = this.pos.gui;
+    var db = this.pos.db;
+    var producto_regalo_id = this.pos.config.producto_descuento_id;
+
+    //--------------Variable para promocion-----------------------------------
+		var promociones = false, horas=false, producto_beneficio= false, productos_promocion=false, diccionario_productos = {}, condicion=false;
+		var promos_llevar = 0, calculo_repetir=false, suma_promos_llevar=0, lista_regalos=false, porcentaje=0, clientes;
+		var resta = 0, cantidad_unitaria_regalo=0,suma_cantidad_regalo=0, precio_unitario=0, producto_regalo =0, cliente=false;
+
+    var diccionario_productos_regalo={}, producto_beneficio1=false ;
+    promociones = self.pos.promocion;
+    cliente = order.attributes.client.id;
+
+    var today = new Date();
+		var hora = today.getHours();
+		var minuto = today.getMinutes();
+		if( minuto.toString().length == 1){
+				minuto = '0'+minuto
+		}
+
+		var hora_minuto = today.getHours()+':'+minuto;
+		var hora_minuto1 = moment(hora_minuto, ["h:mm A"]).format("HH:mm");
+
+    order.get_orderlines().forEach(function(l) {
+      for (var i = 0; i < promociones.length; i++) {
+
+        var validation_date = new Date();
+
+        var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY");
+
+        var fecha_promo_in = promociones[i].fecha_inicio;
+        var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY");
+
+        var fecha_promo_fin = promociones[i].fecha_fin;
+        var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY");
+
+        if (promociones[i].tipo_select == 'promo') {
+
+          horas = self.get_hora(promociones[i].hora_inicio, promociones[i].hora_final);
+
+          var hora_inic, hora_fina;
+
+          for (var n = 0; n < horas.length; n++) {
+            horas[n];
+            hora_inic = horas[0];
+            hora_fina = horas[1];
+          }
+
+          if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 != fecha_promo_fin0)){
+
+            if ( (hora_minuto1 >= hora_inic )){
+
+              producto_beneficio = promociones[i].productos_regalo_ids;
+              productos_promocion = promociones[i].productos_ids;
+
+              clientes = promociones[i].cliente_ids;
+
+
+              if (clientes.includes(cliente)) {
+
+                if ( (productos_promocion.includes(l.product.id) ) ) {
+
+                  if ( productos_promocion.includes(l.product.id)) {
+
+                    if (!(l.product.id in diccionario_productos )) {
+                      console.log("Tercer IF ;D");
+                      diccionario_productos[l.product.id]={
+                      'id': l.product.id, 'cantidad': 0,
+                      'promos_llevar': 0,
+                      'listado_regalos': producto_beneficio,
+                      'cantidad_regalo':0,
+                      'porcentaje':0}
+                    }
+
+                  }
+                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                }
+
+              }
+              else if (clientes.length <= 0) {
+                console.log("demosle para todos condicion tipo promocion");
+                if ( (productos_promocion.includes(l.product.id) ) ) {
+
+                  if ( productos_promocion.includes(l.product.id)) {
+
+                    if (!(l.product.id in diccionario_productos )) {
+                      diccionario_productos[l.product.id]={
+                      'id': l.product.id, 'cantidad': 0,
+                      'promos_llevar': 0,
+                      'listado_regalos': producto_beneficio,
+                      'cantidad_regalo':0,
+                      'porcentaje':0}
+                    }
+
+                  }
+
+                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                }
+              }
+
+            }
+
+          }
+          else if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 == fecha_promo_fin0)){
+
+            if ( (hora_minuto1 <= hora_fina)){
+
+              producto_beneficio = promociones[i].productos_regalo_ids;
+              productos_promocion = promociones[i].productos_ids;
+
+              clientes = promociones[i].cliente_ids;
+
+
+              if (clientes.includes(cliente)) {
+
+                if ( (productos_promocion.includes(l.product.id) ) ) {
+
+                  if ( productos_promocion.includes(l.product.id)) {
+
+                    if (!(l.product.id in diccionario_productos )) {
+                      console.log("Tercer IF ;D");
+                      diccionario_productos[l.product.id]={
+                      'id': l.product.id, 'cantidad': 0,
+                      'promos_llevar': 0,
+                      'listado_regalos': producto_beneficio,
+                      'cantidad_regalo':0,
+                      'porcentaje':0}
+                    }
+
+                  }
+
+                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+
+                }
+
+              }
+              else if (clientes.length <= 0) {
+                console.log("demosle para todos condicion tipo promocion");
+                if ( (productos_promocion.includes(l.product.id) ) ) {
+
+                  if ( productos_promocion.includes(l.product.id)) {
+
+                    if (!(l.product.id in diccionario_productos )) {
+                      diccionario_productos[l.product.id]={
+                      'id': l.product.id, 'cantidad': 0,
+                      'promos_llevar': 0,
+                      'listado_regalos': producto_beneficio,
+                      'cantidad_regalo':0,
+                      'porcentaje':0}
+                    }
+
+                  }
+
+                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+
+                }
+              }
+
+            }
+
+          }
+
+        }
+
+
+      }
+
+    });
+
+
+    return diccionario_productos;
+  },
+
   button_click: function(){
     var self = this;
     var order = this.pos.get_order();
@@ -146,311 +515,55 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 		order.descuento = 0;
 		//--------------Variable para promocion-----------------------------------
 		var promociones = false, horas=false, producto_beneficio= false, productos_promocion=false, diccionario_productos = {}, condicion=false;
-		var promos_llevar = 0, calculo_repetir=false, suma_promos_llevar=0, lista_regalos=false, porcentaje=0, clientes;
-		var resta = 0, cantidad_unitaria_regalo=0,suma_cantidad_regalo=0, precio_unitario=0, producto_regalo =0, cliente=false;
+		var promos_llevar = 0, calculo_repetir=false, suma_promos_llevar=0, lista_regalos=false, porcentaje=0;
+		var resta = 0, cantidad_unitaria_regalo=0,suma_cantidad_regalo=0, precio_unitario=0, producto_regalo =0;
 
 		var diccionario_productos_regalo={}, producto_beneficio1=false ;
 		promociones = self.pos.promocion;
 
 		//--------------Variable para descuento-----------------------------------
-		var diccionario_productos_descuento={}, producto_beneficio0=false, productos_promocion0=0;
+		var diccionario_productos_descuento = false, producto_beneficio0=false, productos_promocion0=0;
 		var calculo_repetir0= 0, promos_llevar0=0, precio_final=0;
-    cliente = order.attributes.client.id;
-
-		var today = new Date();
-		var hora = today.getHours();
-		var minuto = today.getMinutes();
-		if( minuto.toString().length == 1){
-				minuto = '0'+minuto
-		}
-
-		var hora_minuto = today.getHours()+':'+minuto;
-		var hora_minuto1 = moment(hora_minuto, ["h:mm A"]).format("HH:mm");
 
 
+    diccionario_productos_descuento = self.get_tipo_descuento();
+    diccionario_productos = self.get_tipo_promocion();
 
 		order.get_orderlines().forEach(function(l) {
 			for (var g = 0; g < promociones.length; g++) {
 
-        var validation_date = new Date();
-
-        var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY");
-
-        var fecha_promo_in = promociones[g].fecha_inicio;
-        var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY");
-
-        var fecha_promo_fin = promociones[g].fecha_fin;
-        var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY");
-
-				if (promociones[g].tipo_select == 'promo') {
+        if (promociones[g].tipo_select == 'promo') {
 					for (var i = 0; i < promociones.length; i++) {
-							horas = self.get_hora(promociones[i].hora_inicio, promociones[i].hora_final);
 
-							var hora_inic, hora_fina;
+              condicion = promociones[i].pos_condicion_promocion_ids;
+              for (var j = 0; j < condicion.length; j++) {
 
-							for (var n = 0; n < horas.length; n++) {
+                if ( Object.keys(diccionario_productos).length > 0) {
 
-								horas[n];
-								hora_inic = horas[0];
-								hora_fina = horas[1];
+                  if (l.product.id in diccionario_productos) {
 
-							}
+                    if ( l.product.id == diccionario_productos[l.product.id]['id']) {
 
-              if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 != fecha_promo_fin0)){
-                if ( (hora_minuto1 >= hora_inic )){
-                  producto_beneficio = promociones[i].productos_regalo_ids;
-  								productos_promocion = promociones[i].productos_ids;
+                      if (condicion[j].a_partir == 1 && condicion[j].promocion == 1) {
+                        calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
+                      }else {
+                        calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir) ).toFixed(2);
+                      }
+                      promos_llevar = Math.trunc(calculo_repetir);
 
-                  clientes = promociones[i].cliente_ids;
+                      diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
+                      diccionario_productos[l.product.id]['cantidad_regalo']=condicion[j].promocion;
+                      diccionario_productos[l.product.id]['porcentaje']=condicion[j].porcentaje;
 
 
-                  if (clientes.includes(cliente)) {
+                    }
 
-                    if ( (productos_promocion.includes(l.product.id) ) ) {
-                      console.log("Primer IF ;D");
-    									if ( productos_promocion.includes(l.product.id)) {
-                        console.log("segundo IF ;D");
-    										if (!(l.product.id in diccionario_productos )) {
-                          console.log("Tercer IF ;D");
-    											diccionario_productos[l.product.id]={
-    											'id': l.product.id, 'cantidad': 0,
-    											'promos_llevar': 0,
-    											'listado_regalos': producto_beneficio,
-    											'cantidad_regalo':0,
-    											'porcentaje':0}
-    										}
-
-    									}
-
-    									diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
-    									condicion = promociones[i].pos_condicion_promocion_ids;
-                      for (var j = 0; j < condicion.length; j++) {
-
-    										if ( Object.keys(diccionario_productos).length > 0) {
-
-    											if (l.product.id in diccionario_productos) {
-
-    												if ( l.product.id == diccionario_productos[l.product.id]['id']) {
-
-    													if (condicion[j].a_partir == 1 && condicion[j].promocion == 1) {
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
-    														console.log("calculo repetir 1");
-    														console.log(calculo_repetir);
-
-    													}else {
-    														console.log("calculo repetir else");
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir) ).toFixed(2);
-    														console.log(calculo_repetir);
-
-    													}
-    													console.log("Fuera de las condiciones calculo repetir");
-    													console.log(calculo_repetir);
-    													promos_llevar = Math.trunc(calculo_repetir);
-
-    													diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
-    													diccionario_productos[l.product.id]['cantidad_regalo']=condicion[j].promocion;
-    													diccionario_productos[l.product.id]['porcentaje']=condicion[j].porcentaje;
-
-
-    												}
-
-    											}
-
-    										}
-
-    									}
-
-    								}
-
-                  }else if (clientes.length <= 0) {
-                    console.log("demosle para todos");
-                    if ( (productos_promocion.includes(l.product.id) ) ) {
-
-    									if ( productos_promocion.includes(l.product.id)) {
-
-    										if (!(l.product.id in diccionario_productos )) {
-    											diccionario_productos[l.product.id]={
-    											'id': l.product.id, 'cantidad': 0,
-    											'promos_llevar': 0,
-    											'listado_regalos': producto_beneficio,
-    											'cantidad_regalo':0,
-    											'porcentaje':0}
-    										}
-
-    									}
-
-    									diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
-    									condicion = promociones[i].pos_condicion_promocion_ids;
-
-    									for (var j = 0; j < condicion.length; j++) {
-
-    										if ( Object.keys(diccionario_productos).length > 0) {
-
-    											if (l.product.id in diccionario_productos) {
-
-    												if ( l.product.id == diccionario_productos[l.product.id]['id']) {
-
-    													if (condicion[j].a_partir == 1 && condicion[j].promocion == 1) {
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
-    														console.log("calculo repetir 1");
-    														console.log(calculo_repetir);
-
-    													}else {
-    														console.log("calculo repetir else");
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir) ).toFixed(2);
-    														console.log(calculo_repetir);
-
-    													}
-    													console.log("Fuera de las condiciones calculo repetir");
-    													console.log(calculo_repetir);
-    													promos_llevar = Math.trunc(calculo_repetir);
-
-    													diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
-    													diccionario_productos[l.product.id]['cantidad_regalo']=condicion[j].promocion;
-    													diccionario_productos[l.product.id]['porcentaje']=condicion[j].porcentaje;
-
-
-    												}
-
-    											}
-
-    										}
-
-    									}
-
-    								}
-                  }
-
-                }
-
-              }else if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 == fecha_promo_fin0)) {
-                if ( (hora_minuto1 <= hora_fina) ) {
-                  producto_beneficio = promociones[i].productos_regalo_ids;
-  								productos_promocion = promociones[i].productos_ids;
-
-                  clientes = promociones[i].cliente_ids;
-
-
-                  if (clientes.includes(cliente)) {
-
-                    if ( (productos_promocion.includes(l.product.id) ) ) {
-                      console.log("Primer IF ;D");
-    									if ( productos_promocion.includes(l.product.id)) {
-                        console.log("segundo IF ;D");
-    										if (!(l.product.id in diccionario_productos )) {
-                          console.log("Tercer IF ;D");
-    											diccionario_productos[l.product.id]={
-    											'id': l.product.id, 'cantidad': 0,
-    											'promos_llevar': 0,
-    											'listado_regalos': producto_beneficio,
-    											'cantidad_regalo':0,
-    											'porcentaje':0}
-    										}
-
-    									}
-
-    									diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
-    									condicion = promociones[i].pos_condicion_promocion_ids;
-                      for (var j = 0; j < condicion.length; j++) {
-
-    										if ( Object.keys(diccionario_productos).length > 0) {
-
-    											if (l.product.id in diccionario_productos) {
-
-    												if ( l.product.id == diccionario_productos[l.product.id]['id']) {
-
-    													if (condicion[j].a_partir == 1 && condicion[j].promocion == 1) {
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
-    														console.log("calculo repetir 1");
-    														console.log(calculo_repetir);
-
-    													}else {
-    														console.log("calculo repetir else");
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir) ).toFixed(2);
-    														console.log(calculo_repetir);
-
-    													}
-    													console.log("Fuera de las condiciones calculo repetir");
-    													console.log(calculo_repetir);
-    													promos_llevar = Math.trunc(calculo_repetir);
-
-    													diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
-    													diccionario_productos[l.product.id]['cantidad_regalo']=condicion[j].promocion;
-    													diccionario_productos[l.product.id]['porcentaje']=condicion[j].porcentaje;
-
-
-    												}
-
-    											}
-
-    										}
-
-    									}
-
-    								}
-
-                  }else if (clientes.length <= 0) {
-                    console.log("demosle para todos");
-                    if ( (productos_promocion.includes(l.product.id) ) ) {
-
-    									if ( productos_promocion.includes(l.product.id)) {
-
-    										if (!(l.product.id in diccionario_productos )) {
-    											diccionario_productos[l.product.id]={
-    											'id': l.product.id, 'cantidad': 0,
-    											'promos_llevar': 0,
-    											'listado_regalos': producto_beneficio,
-    											'cantidad_regalo':0,
-    											'porcentaje':0}
-    										}
-
-    									}
-
-    									diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
-    									condicion = promociones[i].pos_condicion_promocion_ids;
-
-    									for (var j = 0; j < condicion.length; j++) {
-
-    										if ( Object.keys(diccionario_productos).length > 0) {
-
-    											if (l.product.id in diccionario_productos) {
-
-    												if ( l.product.id == diccionario_productos[l.product.id]['id']) {
-
-    													if (condicion[j].a_partir == 1 && condicion[j].promocion == 1) {
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
-    														console.log("calculo repetir 1");
-    														console.log(calculo_repetir);
-
-    													}else {
-    														console.log("calculo repetir else");
-    														calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[j].a_partir) ).toFixed(2);
-    														console.log(calculo_repetir);
-
-    													}
-    													console.log("Fuera de las condiciones calculo repetir");
-    													console.log(calculo_repetir);
-    													promos_llevar = Math.trunc(calculo_repetir);
-
-    													diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
-    													diccionario_productos[l.product.id]['cantidad_regalo']=condicion[j].promocion;
-    													diccionario_productos[l.product.id]['porcentaje']=condicion[j].porcentaje;
-
-
-    												}
-
-    											}
-
-    										}
-
-    									}
-
-    								}
                   }
 
                 }
 
               }
+
 
 
 					}
@@ -472,592 +585,122 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 				}
 
 				if (promociones[g].tipo_select == 'desc') {
-					for (var k = 0; k < promociones.length; k++) {
-						horas = self.get_hora(promociones[k].hora_inicio, promociones[k].hora_final);
 
-						var hora_inic, hora_fina;
+          condicion = promociones[g].pos_condicion_descuento_ids;
 
-						for (var n = 0; n < horas.length; n++) {
-							horas[n];
-							hora_inic = horas[0];
-							hora_fina = horas[1];
-						}
-
-
-            if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 != fecha_promo_fin0)){
-
-              if ( (hora_minuto1 >= hora_inic )){
-
-                clientes = promociones[k].cliente_ids;
-
-  							productos_promocion0 = promociones[k].productos_ids;
-
-                if (clientes.includes(cliente)) {
-
-                  if ( productos_promocion0.includes(l.product.id)) {
-    								if (!(l.product.id in diccionario_productos_descuento)) {
-    									diccionario_productos_descuento[l.product.id]={
-    										'id':l.product.id,
-    										'tipo_descuento': false,
-    										'cantidad': 0,
-    										'precio_unitario': l.get_unit_price(),
-    										'promos_llevar':0,
-    										'total':0,
-    										'descuento':0,
-    										'cantidad_regalo':0,
-    										'cantidad_descuento':0
-    									};
-    								}
-    								diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
-    								diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
-    								condicion = promociones[k].pos_condicion_descuento_ids;
-
-
-    								if ( promociones[k].aplicar == 'dinero') {
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-
-    									for (var m = 0; m < condicion.length; m++) {
-
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-    														if (condicion[m].partir_de == 0 ) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}
-    														else {
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-
-    													}
-    												} else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-    														console.log("condicion.descuento");
-    														console.log(condicion[m].descuento);
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-
-    														if (condicion[m].partir_de == 0) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}else{
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    															return;
-    														}
-
-    													}
-    												}
-
-
-
-
-    											}
-
-    										}
-
-
-    									}
-
-
-    								}
-
-    								else if ( promociones[k].aplicar == 'uni' ){
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-    									for (var m = 0; m < condicion.length; m++) {
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de - condicion[m].descuento) ).toFixed(2);
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion.partir_de;
-    													}
-
-    												}
-    												else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
-
-    													}
-    												}
-
-    											}
-    										}
-
-    									}
-
-    								}
-
-    							}
-
-                }else if (clientes.length <= 0) {
-
-                  if ( productos_promocion0.includes(l.product.id)) {
-    								if (!(l.product.id in diccionario_productos_descuento)) {
-    									diccionario_productos_descuento[l.product.id]={
-    										'id':l.product.id,
-    										'tipo_descuento': false,
-    										'cantidad': 0,
-    										'precio_unitario': l.get_unit_price(),
-    										'promos_llevar':0,
-    										'total':0,
-    										'descuento':0,
-    										'cantidad_regalo':0,
-    										'cantidad_descuento':0
-    									};
-    								}
-    								diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
-    								diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
-    								condicion = promociones[k].pos_condicion_descuento_ids;
-
-
-    								if ( promociones[k].aplicar == 'dinero') {
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-
-    									for (var m = 0; m < condicion.length; m++) {
-
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-    														if (condicion[m].partir_de == 0 ) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}
-    														else {
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-
-    													}
-    												} else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-    														console.log("condicion.descuento");
-    														console.log(condicion[m].descuento);
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-
-    														if (condicion[m].partir_de == 0) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}else{
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    															return;
-    														}
-
-    													}
-    												}
-
-
-
-
-    											}
-
-    										}
-
-
-    									}
-
-
-    								}
-
-    								else if ( promociones[k].aplicar == 'uni' ){
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-    									for (var m = 0; m < condicion.length; m++) {
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de - condicion[m].descuento) ).toFixed(2);
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion.partir_de;
-    													}
-
-    												}
-    												else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
-
-    													}
-    												}
-
-    											}
-    										}
-
-    									}
-
-    								}
-
-    							}
-
-                }
-
-              }
-
-            }else if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0) && (fecha_sesion0 == fecha_promo_fin0)) {
-
-              if ( (hora_minuto1 <= hora_fina) ) {
-                console.log("aun no es hora final");
-                clientes = promociones[k].cliente_ids;
-                console.log("cliente");
-                console.log(cliente);
-  							productos_promocion0 = promociones[k].productos_ids;
-
-                if (clientes.includes(cliente)) {
-
-                  if ( productos_promocion0.includes(l.product.id)) {
-    								if (!(l.product.id in diccionario_productos_descuento)) {
-    									diccionario_productos_descuento[l.product.id]={
-    										'id':l.product.id,
-    										'tipo_descuento': false,
-    										'cantidad': 0,
-    										'precio_unitario': l.get_unit_price(),
-    										'promos_llevar':0,
-    										'total':0,
-    										'descuento':0,
-    										'cantidad_regalo':0,
-    										'cantidad_descuento':0
-    									};
-    								}
-    								diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
-    								diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
-    								condicion = promociones[k].pos_condicion_descuento_ids;
-
-
-    								if ( promociones[k].aplicar == 'dinero') {
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-
-    									for (var m = 0; m < condicion.length; m++) {
-
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-    														if (condicion[m].partir_de == 0 ) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}
-    														else {
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-
-    													}
-    												} else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-    														console.log("condicion.descuento");
-    														console.log(condicion[m].descuento);
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-
-    														if (condicion[m].partir_de == 0) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}else{
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    															return;
-    														}
-
-    													}
-    												}
-
-
-
-
-    											}
-
-    										}
-
-
-    									}
-
-
-    								}
-
-    								else if ( promociones[k].aplicar == 'uni' ){
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-    									for (var m = 0; m < condicion.length; m++) {
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de - condicion[m].descuento) ).toFixed(2);
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion.partir_de;
-    													}
-
-    												}
-    												else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
-
-    													}
-    												}
-
-    											}
-    										}
-
-    									}
-
-    								}
-
-    							}
-
-                }else if (clientes.length <= 0) {
-
-                  if ( productos_promocion0.includes(l.product.id)) {
-    								if (!(l.product.id in diccionario_productos_descuento)) {
-    									diccionario_productos_descuento[l.product.id]={
-    										'id':l.product.id,
-    										'tipo_descuento': false,
-    										'cantidad': 0,
-    										'precio_unitario': l.get_unit_price(),
-    										'promos_llevar':0,
-    										'total':0,
-    										'descuento':0,
-    										'cantidad_regalo':0,
-    										'cantidad_descuento':0
-    									};
-    								}
-    								diccionario_productos_descuento[l.product.id]['cantidad']+=l.get_quantity();
-    								diccionario_productos_descuento[l.product.id]['total']+=l.get_base_price();
-    								condicion = promociones[k].pos_condicion_descuento_ids;
-
-
-    								if ( promociones[k].aplicar == 'dinero') {
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-
-    									for (var m = 0; m < condicion.length; m++) {
-
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-    														if (condicion[m].partir_de == 0 ) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}
-    														else {
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-
-    													}
-    												} else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-    														console.log("condicion.descuento");
-    														console.log(condicion[m].descuento);
-    														diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
-
-    														if (condicion[m].partir_de == 0) {
-    															console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
-    														}else{
-    															calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
-    														}
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														if (diccionario_productos_descuento.length > 1) {
-    																diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														}
-    														else {
-    															diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    															return;
-    														}
-
-    													}
-    												}
-
-
-
-
-    											}
-
-    										}
-
-
-    									}
-
-
-    								}
-
-    								else if ( promociones[k].aplicar == 'uni' ){
-
-    									diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[k].aplicar;
-    									for (var m = 0; m < condicion.length; m++) {
-
-    										if ( Object.keys(diccionario_productos_descuento).length > 0) {
-
-    											if (l.product.id in diccionario_productos_descuento) {
-    												if (condicion.length > 1) {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de - condicion[m].descuento) ).toFixed(2);
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion.partir_de;
-    													}
-
-    												}
-    												else {
-    													if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
-    														calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
-
-    														promos_llevar0 = Math.trunc(calculo_repetir0);
-
-    														diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
-    														diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-    														diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
-
-    													}
-    												}
-
-    											}
-    										}
-
-    									}
-
-    								}
-
-    							}
-
-                }
-
-
-              }
+          if ( promociones[g].aplicar == 'dinero') {
+            if (l.product.id in diccionario_productos_descuento) {
+              diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[g].aplicar;
             }
 
 
+            for (var m = 0; m < condicion.length; m++) {
+              if ( Object.keys(diccionario_productos_descuento).length > 0) {
+                if (l.product.id in diccionario_productos_descuento) {
 
-					}
+                  if (condicion.length > 1) {
+                    if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+
+                      diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
+                      diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
+                      if (condicion[m].partir_de == 0 ) {
+                        console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
+                      }
+                      else {
+                        calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
+                      }
+
+                      promos_llevar0 = Math.trunc(calculo_repetir0);
+                      if (diccionario_productos_descuento.length > 1) {
+                          diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                      }
+                      else {
+                        diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                      }
+
+                    }
+                  } else {
+                    if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                      diccionario_productos_descuento[l.product.id]['descuento'] = condicion[m].descuento;
+                      diccionario_productos_descuento[l.product.id]['cantidad_descuento'] = condicion[m].partir_de;
+
+                      if (condicion[m].partir_de == 0) {
+                        console.log("no se puede crear una promoción sin la condicon 'a partir de' ←");
+                      }else{
+                        calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['total'] / (condicion[m].partir_de) ).toFixed(2);
+                      }
+
+                      promos_llevar0 = Math.trunc(calculo_repetir0);
+
+                      if (diccionario_productos_descuento.length > 1) {
+                          diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                      }
+                      else {
+                        diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                        return;
+                      }
+
+                    }
+                  }
+
+
+
+
+                }
+
+              }
+
+
+            }
+
+
+          }
+
+          else if ( promociones[g].aplicar == 'uni' ){
+            if (l.product.id in diccionario_productos_descuento) {
+              diccionario_productos_descuento[l.product.id]['tipo_descuento'] = promociones[g].aplicar;
+            }
+
+
+            for (var m = 0; m < condicion.length; m++) {
+
+              if ( Object.keys(diccionario_productos_descuento).length > 0) {
+
+                if (l.product.id in diccionario_productos_descuento) {
+
+                  if (condicion.length > 1) {
+                    if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+
+                      calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de - condicion[m].descuento) ).toFixed(2);
+                      promos_llevar0 = Math.trunc(calculo_repetir0);
+
+                      diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                      diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
+                      diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion.partir_de;
+                    }
+
+                  }
+                  else {
+                    if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+
+                      calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
+
+                      promos_llevar0 = Math.trunc(calculo_repetir0);
+
+                      diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                      diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
+                      diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
+
+                    }
+                  }
+
+                }
+              }
+
+            }
+
+          }
+
 
 				}
 
@@ -1067,6 +710,11 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 		});
 
 
+
+
+    //Veficando el tamaño de los diccionarios para proceder con los calculos de tipo promoción o descuento
+    console.log("diccionario_productos");
+    console.log(diccionario_productos);
 		if ( Object.keys(diccionario_productos).length > 0) {
 			for (const [key, value] of  Object.entries(diccionario_productos) ) {
 				lista_regalos = value['listado_regalos'];
@@ -1088,8 +736,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 									value['promos_llevar'] -= restar_promos_llevar;
 
-									console.log("IF Order");
-									console.log(order.descuento);
 								}
 								else if (value['promos_llevar'] > 0 && value0['cantidad'] > 0 && value['promos_llevar'] > value0['cantidad']){
 
@@ -1101,8 +747,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 									value['cantidad'] = 0;
 
 									value['promos_llevar'] -= restar_promos_llevar;
-									console.log("ORDER ELSE");
-									console.log(order.descuento);
+
 								}
 							}
 					}
@@ -1112,7 +757,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 			}
 		} //fin de verificación del tamaño del diccionario_productos
 
-
+    console.log("diccionario_productos_descuento");
+    console.log(diccionario_productos_descuento);
 		if ( Object.keys(diccionario_productos_descuento).length > 0) {
 			for (const [key1, value1] of Object.entries(diccionario_productos_descuento)) {
 
