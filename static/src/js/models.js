@@ -31,18 +31,45 @@ models.load_models({
 				tiendas = pos_promocion.tienda_ids;
 
 				if (tiendas.includes(self.config.id) ) {
-
 					var validation_date = new Date();
+					validation_date.setHours(0, 0, 0, 0);
+					var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY");
+					var lastDayOfMonth = new Date(validation_date.getFullYear(), validation_date.getMonth()+1, 0);
+					var ultimo_dia = moment(lastDayOfMonth).utc().local().format("DD");
 
-					var fecha_sesion0 = moment(validation_date).utc().local().format("DD-MM-YYYY")
 
 					var fecha_promo_in = pos_promocion.fecha_inicio;
-					var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY")
+					var fecha_promo_inicio = new Date(fecha_promo_in);
+					var fecha_promo_in0 = moment(fecha_promo_in).utc().local().format("DD-MM-YYYY");
 
 					var fecha_promo_fin = pos_promocion.fecha_fin;
-					var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY")
+					var fecha_promo_final = new Date(fecha_promo_fin);
+					var prueba_fecha_final = moment(fecha_promo_final).utc().local();
+					fecha_promo_final.setHours(0, 0, 0, 0);
+					var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY");
+
+
+					// var dateCalendarPart0 = moment(fecha_promo_fin,'DD-MM-YYYY');
+
+					var fecha_menor = moment(validation_date).isAfter(fecha_promo_final);
+					var fecha_igual = moment(validation_date).isSame(fecha_promo_final);
+
+					// if ( fecha_menor == false && fecha_igual == true || fecha_menor == true && fecha_igual == false ) {
+					// 	console.log("Si es menor");
+					// 	console.log(fecha_menor);
+					// 	console.log(fecha_igual);
+					// 	console.log(fecha_promo_in0);
+					// }
+
+					console.log(fecha_promo_final.getUTCDate());
+					if (validation_date < fecha_promo_final || validation_date.toDateString() === fecha_promo_final.toDateString()) {
+						console.log("entramos");
+						console.log(fecha_promo_fin0 );
+					}
+
 
 					if ((fecha_sesion0 >= fecha_promo_in0) && (fecha_sesion0 <= fecha_promo_fin0)){
+
 						var posicion = pos_promocion;
 						var promocion_i = pos_promocion;
 
@@ -102,7 +129,15 @@ models.load_models({
 
 						self.promocion.push(promocion_i); //se agrega el listado de promociones a self
 
-						}
+					}
+					// else if ( (año_mes_sesion >= año_mes_promo_inicio) && (año_mes_sesion <= año_mes_promo_final) ) {
+					//
+					// 	if ( (dia_sesion <= dia_promo_inicio) && ( dia_sesion <= ultimo_dia) && (dia_sesion >= dia_promo_final) && (activar == true) ){
+					// 		console.log("Entramos pero hay que hacer que truene =( ");
+					// 	}
+					//
+					//
+					// }
 
 				}
 
@@ -539,7 +574,7 @@ models.Orderline = models.Orderline.extend({
 			_super_order_line.set_quantity.apply(this,arguments);
 			this.trigger('change', this);
 
-			
+
 			//self.get_buscarProductoPromocion(self.product, this.pos.promocion);
 			//self.get_buscarProductoDescuento(self.product, this.pos.promocion);
 
