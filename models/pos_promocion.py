@@ -37,4 +37,4 @@ class PosPromocionesDescuento(models.Model):
 
     descuento_id = fields.Many2one('pos_promociones.promocion')
     partir_de = fields.Integer('A partir de')
-    descuento = fields.Integer('Descuento')
+    descuento = fields.Float('Descuento')
