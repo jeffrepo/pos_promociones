@@ -725,8 +725,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                         promos_llevar0 = Math.trunc(calculo_repetir0);
 
                         if (condicion[m]['descuento_id'][0] == diccionario_productos_descuento[l.product.id]['n_promocion']) {
-                          console.log("Ya me desespero esta onda ");
-                          console.log(condicion[m]['descuento_id'][0]);
                           diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
                           diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
                           diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
@@ -808,9 +806,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
   								}
 
                 }else if (value['id_condicion'] == value0['id_condicion'] && value['id'] == value0['id']) {
-                  console.log("Somos igual");
-                  console.log(value['id']);
-                  console.log(value0['id']);
                   var rest_prueba=0;
                   if (value['promos_llevar'] == value0['cantidad']) {
                     rest_prueba = Math.trunc(value['promos_llevar'] / 2);
