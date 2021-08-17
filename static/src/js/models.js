@@ -33,6 +33,7 @@ models.load_models({
 				if (tiendas.includes(self.config.id) ) {
 					var validation_date = new Date();
 					var fecha_sesion0 = moment(validation_date).utc().local()
+					//var fecha_sesion01 = new Date(fecha_sesion0.replace(/-/g, '\/'));
 					var lastDayOfMonth = new Date(validation_date.getFullYear(), validation_date.getMonth()+1, 0);
 					var ultimo_dia = moment(lastDayOfMonth).utc().local().format("DD");
 
@@ -46,7 +47,6 @@ models.load_models({
 					var prueba_fecha_final = moment(fecha_promo_final).utc().local();
 					fecha_promo_final.setHours(0, 0, 0, 0);
 					var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY");
-
 
 					if ((fecha_sesion0 >= fecha_promo_inicio) && (fecha_sesion0 <= fecha_promo_final)){
 						
