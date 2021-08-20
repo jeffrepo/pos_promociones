@@ -592,7 +592,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 		//--------------Variable para descuento-----------------------------------
 		var diccionario_productos_descuento = false, diccionario_promos_pedidos = {}, producto_beneficio0=false, productos_promocion0=0;
-		var calculo_repetir0= 0, promos_llevar0=0, precio_final=0, sumando_cantidades_descuento=0, new_quantity_discount=0, repeticion_promos=0;
+		var calculo_repetir0= 0,promos_llevar0=0, nuevo_diccionario={},precio_final=0, sumando_cantidades_descuento=0, new_quantity_discount=0, repeticion_promos=0;
 
     diccionario_productos_descuento = self.get_tipo_descuento()[0];
     //diccionario_n_promociones = self.get_tipo_descuento()[1];
@@ -642,21 +642,35 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
           producto_beneficio1 = promociones[g].productos_regalo_ids;
           if (producto_beneficio1.includes(l.product.id)) {
-
-            if (!(l.product.id in diccionario_productos_regalo)) {
+            console.log("Diccionario productos regalo");
+            console.log(diccionario_productos_regalo);
+            console.log(l);
+            console.log(diccionario_productos_regalo.hasOwnProperty(l.product.id));
+            if (diccionario_productos_regalo.hasOwnProperty(l.product.id) == false ) {
+              console.log(l.product.id);
+              console.log(l.product.display_name);
               diccionario_productos_regalo[l.product.id]={
                 'id': l.product.id,
                 'cantidad': 0,
                 'total':0,
-                'precio_unitario': l.get_unit_price(),
+                'precio_unitario': 0,
                 'id_condicion': promociones[g].condicion_promocion_ids[0],
               };
             }
-
-            diccionario_productos_regalo[l.product.id]['cantidad']+= l.get_quantity();
-            diccionario_productos_regalo[l.product.id]['total']+=l.get_base_price();
+            diccionario_productos_regalo[l.product.id]['cantidad'] += 15;
+            console.log(l.get_quantity());
+            diccionario_productos_regalo[l.product.id]['total'] +=l.get_base_price();
 
           }
+
+
+          // if (l.product.id in diccionario_productos_regalo) {
+          //
+          //
+          //
+          //
+          // }
+
 
 
 				}
@@ -778,6 +792,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       }
                     }
 
+
+
                     if (diccionario_productos_descuento[l.product.id]['estado'] == false) {
 
                       //diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
@@ -785,7 +801,21 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       diccionario_productos_descuento[l.product.id]['estado'] = true;
 
                     }
+                  }
 
+                  if (diccionario_productos_descuento[l.product.id]['n_promocion'].length == 1) {
+                    if ( condicion[0]['id'] in diccionario_promos_pedidos ) {
+                      if (diccionario_productos_descuento[l.product.id]['n_promocion'][0] == condicion[0]['id']) {
+
+                        if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id'])) {
+                          if (diccionario_promos_pedidos[condicion[0]['id']]['estado'] == false) {
+                            diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
+                            //diccionario_promos_pedidos[condicion[0]['id']]['estado'] =true;
+                          }
+                        }
+
+                      }
+                    }
 
                   }
 
@@ -809,6 +839,28 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                   }
 
+                }else {
+
+                  if (condicion[0]['id'] in diccionario_promos_pedidos) {
+                    if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] > 0) {
+                      repeticion_promos = Math.trunc( diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] / diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] );
+                    }
+
+                    //repeticion_promos = Math.trunc( sumando_cantidades_descuento / diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] );
+
+                    diccionario_promos_pedidos[condicion[0]['id']]['cantidad'] = ( diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] * repeticion_promos);
+
+                    diccionario_promos_pedidos[condicion[0]['id']]['total'] = diccionario_productos_descuento[l.product.id]['precio_unitario'];
+
+                    if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad'] >= diccionario_promos_pedidos[condicion[0]['id']]['a_partir']) {
+                      var ttal = (( diccionario_promos_pedidos[condicion[0]['id']]['cantidad'] * diccionario_promos_pedidos[condicion[0]['id']]['total'] ) * ( diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100))
+                      diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = ttal;
+
+                    }
+                  }
+
+
+
                 }
 
               };
@@ -822,7 +874,9 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                   if (l.product.id in diccionario_productos_descuento) {
 
                     if (condicion.length > 1) {
-
+                      // if (!(condicion[0]['id'] in diccionario_promos_pedidos)) {
+                      //
+                      // }
                       if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
 
                         if (diccionario_productos_descuento[l.product.id]['n_promocion'].length < 1) {
@@ -853,21 +907,24 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                       if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id'])) {
                         if ( diccionario_productos_descuento[l.product.id]['n_promocion'].length == 1) {
-
                           if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                            if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
 
-                            calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
-                            diccionario_productos_descuento[l.product.id]['estado'] = true;
+                              calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
+                              diccionario_productos_descuento[l.product.id]['estado'] = true;
 
-                            promos_llevar0 = Math.trunc(calculo_repetir0);
+                              promos_llevar0 = Math.trunc(calculo_repetir0);
 
-                            if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id']) ) {
-                              diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
+                              if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id']) ) {
+                                diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
 
-                              diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
-                              diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
+                                diccionario_productos_descuento[l.product.id]['descuento']=condicion[m].descuento;
+                                diccionario_productos_descuento[l.product.id]['cantidad_regalo']=condicion[m].partir_de;
+
+                              }
 
                             }
+
 
                           }
 
@@ -898,9 +955,10 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     //Veficando el tamaño de los diccionarios para proceder con los calculos de tipo promoción o descuento
 
 		if ( Object.keys(diccionario_productos).length > 0) {
-      console.log("diccionario_productos");
-      console.log(diccionario_productos);
-      console.log(diccionario_productos_regalo);
+      // console.log("diccionario_productos");
+      // console.log(diccionario_productos);
+      // console.log("Diccionario productos regalo");
+      // console.log(diccionario_productos_regalo);
       for (const [key, value] of  Object.entries(diccionario_productos) ) {
 				lista_regalos = value['listado_regalos'];
 				suma_cantidad_regalo +=value['cantidad_regalo'];
@@ -926,9 +984,13 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                     order.descuento += ( (value0['precio_unitario'] * (value['porcentaje']/100) )* value['promos_llevar']);
 
-
+                    console.log("Valor antes");
+                    console.log(value0);
+                    console.log(value0['cantidad']);
   									value0['cantidad'] -= value['promos_llevar'];
-  									value['promos_llevar'] -= restar_promos_llevar;
+                    console.log("Value 0 despues");
+                    console.log(value0['cantidad']);
+                    value['promos_llevar'] -= restar_promos_llevar;
 
   								}
   								else if (value['promos_llevar'] > 0 && value0['cantidad'] > 0 && value['promos_llevar'] > value0['cantidad']){
@@ -992,15 +1054,16 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 
 		if ( Object.keys(diccionario_productos_descuento).length > 0) {
-      console.log("diccionario_productos_descuento");
-      console.log(diccionario_productos_descuento);
-      console.log("diccionario_promos_pedidos");
-      console.log(diccionario_promos_pedidos);
-      console.log("_____________________");
-      var n=0, nuevo_diccionario={}, n_promocion=0, cantidad_x=0, n1=0;
+      // console.log("diccionario_productos_descuento");
+      // console.log(diccionario_productos_descuento);
+      // console.log("diccionario_promos_pedidos");
+      // console.log(diccionario_promos_pedidos);
+      // console.log("_____________________");
+      var n=0, n_promocion=0, cantidad_x=0, n1=0;
       var valor_descuento_total=[], diccionario_calculo_descuento={};
       for (const [key1, value1] of Object.entries(diccionario_productos_descuento)) {
         n1 +=1;
+
         if (value1['tipo_descuento'] == 'uni') {
 
           if ( value1['n_promocion'].length <= 1) {
@@ -1110,8 +1173,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
           }
 
-          console.log("diccionario_calculo_descuento");
-          console.log(diccionario_calculo_descuento);
+          // console.log("diccionario_calculo_descuento");
+          // console.log(diccionario_calculo_descuento);
 
           // if (value1['promos_llevar'] > 0 && value1['promos_llevar'] <= value1['cantidad'] && value1['n_promocion'].length < 1) {
           //   console.log("Paso la parte del IF");
@@ -1162,8 +1225,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 		}//Fin de la verificación del tamaño del diccionario_productos_descuento
 
     if (Object.keys(nuevo_diccionario).length > 0) {
-      console.log("El diccionario nuevo ya fuera de todo");
-      console.log(nuevo_diccionario);
+
       for (const [key4, value4] of Object.entries(nuevo_diccionario)) {
         order.descuento += value4['total_regalo'];
       }
