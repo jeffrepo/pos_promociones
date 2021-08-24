@@ -216,18 +216,41 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                   }
 
                   if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion']) ) {
-                    diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
-                    // n_promociones[promociones[i].pos_condicion_descuento_ids[0]['id']]={
-                    //   'id': promociones[i].pos_condicion_descuento_ids[0]['id'],
-                    //   'a_partir': promociones[i].pos_condicion_descuento_ids[0]['partir_de'],
-                    //   'descuento': promociones[i].pos_condicion_descuento_ids[0]['descuento'],
-                    // };
-                  }
+                    if (diccionario_productos_descuento[l.product.id]['n_promocion'].length <= 0) {
+                      diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                    }else {
+                      if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion'])) {
+                        if (!(diccionario_productos_descuento[l.product.id]['n_promocion'].includes(promociones[i].pos_condicion_descuento_ids[0]['id']))) {
+                          diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                        }
 
-                  if (diccionario_productos_descuento[l.product.id]['estado_cantidades'] == false) {
-                    diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
-                    diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
-                    diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+
+                    }
+
+                  }
+                  console.log("Geordie estoy aquí ");
+
+                  if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                    if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+                        diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                        diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                        diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                        diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+                    }else {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+
+                        if (!( diccionario_productos_descuento[l.product.id]['ids_lineas'].includes(l.id) )) {
+                          diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                          diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                          diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                          diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                        }
+
+                      }
+                    }
                   }
 
                   condicion = promociones[i].pos_condicion_descuento_ids;
@@ -255,19 +278,47 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
   										'cantidad_descuento':0,
                       'total_descuento': [],
                       'n_promocion': [],
+                      'ids_lineas':[],
                       'estado': false,
                       'estado_cantidades':false,
   									};
 
                   }
                   if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion']) ) {
-                    diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
-                  }
+                    if (diccionario_productos_descuento[l.product.id]['n_promocion'].length <= 0) {
+                      diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                    }else {
+                      if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion'])) {
+                        if (!(diccionario_productos_descuento[l.product.id]['n_promocion'].includes(promociones[i].pos_condicion_descuento_ids[0]['id']))) {
+                          diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                        }
 
-                  if (diccionario_productos_descuento[l.product.id]['estado_cantidades'] == false) {
-                    diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
-                    diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
-                    diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+
+                    }
+
+                  }
+                  console.log("Geordie estoy aquí 1");
+                  if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                    if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+                        diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                        diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                        diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                        diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+                    }else {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+
+                        if (!( diccionario_productos_descuento[l.product.id]['ids_lineas'].includes(l.id) )) {
+                          diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                          diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                          diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                          diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                        }
+
+                      }
+                    }
                   }
 
                   condicion = promociones[i].pos_condicion_descuento_ids;
@@ -310,20 +361,41 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                   }
 
                   if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion']) ) {
-                    diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
-                    // n_promociones[promociones[i].pos_condicion_descuento_ids[0]['id']]={
-                    //   'id': promociones[i].pos_condicion_descuento_ids[0]['id'],
-                    //   'a_partir': promociones[i].pos_condicion_descuento_ids[0]['partir_de'],
-                    //   'descuento': promociones[i].pos_condicion_descuento_ids[0]['descuento'],
-                    // };
-                  }
+                    if (diccionario_productos_descuento[l.product.id]['n_promocion'].length <= 0) {
+                      diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                    }else {
+                      if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion'])) {
+                        if (!(diccionario_productos_descuento[l.product.id]['n_promocion'].includes(promociones[i].pos_condicion_descuento_ids[0]['id']))) {
+                          diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                        }
 
-                  if (diccionario_productos_descuento[l.product.id]['estado_cantidades'] == false) {
-                    diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
-                    diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
-                    diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
-                  }
+                      }
 
+                    }
+
+                  }
+                  console.log("Geordie estoy aquí 2");
+                  if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                    if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+                        diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                        diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                        diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                        diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+                    }else {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+
+                        if (!( diccionario_productos_descuento[l.product.id]['ids_lineas'].includes(l.id) )) {
+                          diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                          diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                          diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                          diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                        }
+
+                      }
+                    }
+                  }
                   condicion = promociones[i].pos_condicion_descuento_ids;
 
                 }
@@ -355,18 +427,40 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                   }
 
                   if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion']) ) {
-                    diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
-                    // n_promociones[promociones[i].pos_condicion_descuento_ids[0]['id']]={
-                    //   'id': promociones[i].pos_condicion_descuento_ids[0]['id'],
-                    //   'a_partir': promociones[i].pos_condicion_descuento_ids[0]['partir_de'],
-                    //   'descuento': promociones[i].pos_condicion_descuento_ids[0]['descuento'],
-                    // };
-                  }
+                    if (diccionario_productos_descuento[l.product.id]['n_promocion'].length <= 0) {
+                      diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                    }else {
+                      if (!(promociones[i].pos_condicion_descuento_ids[0]['id'] in diccionario_productos_descuento[l.product.id]['n_promocion'])) {
+                        if (!(diccionario_productos_descuento[l.product.id]['n_promocion'].includes(promociones[i].pos_condicion_descuento_ids[0]['id']))) {
+                          diccionario_productos_descuento[l.product.id]['n_promocion'].push(promociones[i].pos_condicion_descuento_ids[0]['id']);
+                        }
 
-                  if (diccionario_productos_descuento[l.product.id]['estado_cantidades'] == false) {
-                    diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
-                    diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
-                    diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+
+                    }
+
+                  }
+                  console.log("Geordie estoy aquí 3");
+                  if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                    if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+                        diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                        diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                        diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                        diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                      }
+                    }else {
+                      if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
+
+                        if (!( diccionario_productos_descuento[l.product.id]['ids_lineas'].includes(l.id) )) {
+                          diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
+                          diccionario_productos_descuento[l.product.id]['total'] +=l.get_base_price();
+                          diccionario_productos_descuento[l.product.id]['ids_lineas'].push(l.id)
+                          diccionario_productos_descuento[l.product.id]['estado_cantidades'] =true;
+                        }
+
+                      }
+                    }
                   }
 
                   condicion = promociones[i].pos_condicion_descuento_ids;
@@ -401,7 +495,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 		var promos_llevar = 0, calculo_repetir=false, suma_promos_llevar=0, lista_regalos=false, porcentaje=0, clientes;
 		var resta = 0, cantidad_unitaria_regalo=0,suma_cantidad_regalo=0, precio_unitario=0, producto_regalo =0, cliente=false;
 
-    var diccionario_productos_regalo={}, producto_beneficio1=false ;
+    var producto_beneficio1=false ;
     promociones = self.pos.promocion;
     cliente = order.attributes.client.id;
 
@@ -642,13 +736,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
           producto_beneficio1 = promociones[g].productos_regalo_ids;
           if (producto_beneficio1.includes(l.product.id)) {
-            console.log("Diccionario productos regalo");
-            console.log(diccionario_productos_regalo);
-            console.log(l);
-            console.log(diccionario_productos_regalo.hasOwnProperty(l.product.id));
             if (diccionario_productos_regalo.hasOwnProperty(l.product.id) == false ) {
-              console.log(l.product.id);
-              console.log(l.product.display_name);
+
               diccionario_productos_regalo[l.product.id]={
                 'id': l.product.id,
                 'cantidad': 0,
@@ -657,21 +746,10 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                 'id_condicion': promociones[g].condicion_promocion_ids[0],
               };
             }
-            diccionario_productos_regalo[l.product.id]['cantidad'] += 15;
-            console.log(l.get_quantity());
+            diccionario_productos_regalo[l.product.id]['cantidad'] += l.get_quantity();
             diccionario_productos_regalo[l.product.id]['total'] +=l.get_base_price();
 
           }
-
-
-          // if (l.product.id in diccionario_productos_regalo) {
-          //
-          //
-          //
-          //
-          // }
-
-
 
 				}
 
@@ -756,15 +834,11 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
             }
             else if ( promociones[g].aplicar == 'uni' && diccionario_productos_descuento[l.product.id]['tipo_descuento'] == 'uni'){
               condicion = promociones[g].pos_condicion_descuento_ids;
-
               if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id'])) {
-
                 if (diccionario_productos_descuento[l.product.id]['id'] === l.product.id) {
 
                   if (diccionario_productos_descuento[l.product.id]['n_promocion'].length > 1) {
-
                     if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
-
                       diccionario_promos_pedidos[condicion[0]['id']]={
                         'cantidad':0,
                         'total':0,
@@ -773,19 +847,51 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                         'total_descuento':0,
                         'productos_ids': [],
                         'cantidad_base':0,
+                        'lineas_ids':[],
                         'estado':false,
-                      }
+                      } //sacar diccionario de aquí
 
                     }
-                    diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+
+                    // if (diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].length <= 0) {
+                    //   diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                    // }else {
+                    //   if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                    //     diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                    //   }
+                    // }
+
 
                     if ( condicion[0]['id'] in diccionario_promos_pedidos ) {
-                      if (diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id)) {
+                      if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
                         if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id'])) {
 
                           if (diccionario_promos_pedidos[condicion[0]['id']]['estado'] == false) {
-                            diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
-                            //diccionario_promos_pedidos[condicion[0]['id']]['estado'] =true;
+
+                            if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] <= 0) {
+                              diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
+                              if (diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].length <= 0) {
+                                diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                              }else {
+                                if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                                  diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                                }
+                              }
+                            }else{
+                              if (!( diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id) )) {
+
+                                diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
+                                if (diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].length <= 0) {
+                                  diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                                }else {
+                                  if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                                    diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                                  }
+                                }
+                              }
+
+                            }
+
                           }
                         }
 
@@ -793,24 +899,27 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                     }
 
 
-
                     if (diccionario_productos_descuento[l.product.id]['estado'] == false) {
-
-                      //diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
                       sumando_cantidades_descuento += diccionario_productos_descuento[l.product.id]['cantidad'];
                       diccionario_productos_descuento[l.product.id]['estado'] = true;
-
                     }
                   }
 
                   if (diccionario_productos_descuento[l.product.id]['n_promocion'].length == 1) {
+
                     if ( condicion[0]['id'] in diccionario_promos_pedidos ) {
                       if (diccionario_productos_descuento[l.product.id]['n_promocion'][0] == condicion[0]['id']) {
 
                         if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id'])) {
                           if (diccionario_promos_pedidos[condicion[0]['id']]['estado'] == false) {
-                            diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
-                            //diccionario_promos_pedidos[condicion[0]['id']]['estado'] =true;
+                            if (!( diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id) )) {
+                              if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+
+                              diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
+                              diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                              diccionario_promos_pedidos[condicion[0]['id']]['lineas_ids'].push(l.id);
+                            }
+
                           }
                         }
 
@@ -868,17 +977,11 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 
               for (var m = 0; m < condicion.length; m++) {
-
                 if ( Object.keys(diccionario_productos_descuento).length > 0) {
 
                   if (l.product.id in diccionario_productos_descuento) {
-
                     if (condicion.length > 1) {
-                      // if (!(condicion[0]['id'] in diccionario_promos_pedidos)) {
-                      //
-                      // }
                       if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
-
                         if (diccionario_productos_descuento[l.product.id]['n_promocion'].length < 1) {
                           sumando_cantidades_descuento += diccionario_productos_descuento[l.product.id]['cantidad'];
 
@@ -907,13 +1010,52 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                       if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id'])) {
                         if ( diccionario_productos_descuento[l.product.id]['n_promocion'].length == 1) {
+
                           if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
                             if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
-
                               calculo_repetir0 = Number(diccionario_productos_descuento[l.product.id]['cantidad'] / (condicion[m].partir_de) ).toFixed(2);
                               diccionario_productos_descuento[l.product.id]['estado'] = true;
 
                               promos_llevar0 = Math.trunc(calculo_repetir0);
+                              diccionario_promos_pedidos[condicion[0]['id']]={
+                                'cantidad':0,
+                                'total':0,
+                                'porcentaje_descuento': condicion[0]['descuento'],
+                                'a_partir': (condicion[0]['partir_de'] + 1),
+                                'total_descuento':0,
+                                'productos_ids': [],
+                                'cantidad_base':0,
+                                'lineas_ids':[],
+                                'estado':false,
+                              }
+                            }
+                            if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                              console.log("Los productos ::");
+                              console.log(l.product.display_name);
+                              console.log(l.product.id);
+                              console.log(diccionario_productos_descuento[l.product.id]['cantidad']);
+                              diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
+                              diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                              console.log(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base']);
+                            }
+
+                            if (condicion[0]['id'] in diccionario_promos_pedidos) {
+                              if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] > 0) {
+                                repeticion_promos = Math.trunc( diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] / diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] );
+                              }
+
+                              //repeticion_promos = Math.trunc( sumando_cantidades_descuento / diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] );
+
+                              diccionario_promos_pedidos[condicion[0]['id']]['cantidad'] = ( diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] * repeticion_promos);
+
+                              diccionario_promos_pedidos[condicion[0]['id']]['total'] = diccionario_productos_descuento[l.product.id]['precio_unitario'];
+
+                              if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad'] >= diccionario_promos_pedidos[condicion[0]['id']]['a_partir']) {
+                                var ttal = (( diccionario_promos_pedidos[condicion[0]['id']]['cantidad'] * diccionario_promos_pedidos[condicion[0]['id']]['total'] ) * ( diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100))
+                                diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = ttal;
+
+                              }
+                            }
 
                               if (diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion[0]['id']) ) {
                                 diccionario_productos_descuento[l.product.id]['promos_llevar']=promos_llevar0;
@@ -924,7 +1066,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                               }
 
                             }
-
 
                           }
 
@@ -955,110 +1096,32 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     //Veficando el tamaño de los diccionarios para proceder con los calculos de tipo promoción o descuento
 
 		if ( Object.keys(diccionario_productos).length > 0) {
-      // console.log("diccionario_productos");
-      // console.log(diccionario_productos);
-      // console.log("Diccionario productos regalo");
-      // console.log(diccionario_productos_regalo);
-      for (const [key, value] of  Object.entries(diccionario_productos) ) {
-				lista_regalos = value['listado_regalos'];
-				suma_cantidad_regalo +=value['cantidad_regalo'];
-				cantidad_unitaria_regalo = value['cantidad_regalo'];
-				suma_promos_llevar += value['promos_llevar'];
-        var el_restante=0;
+      console.log("diccionario_productos");
+      console.log(diccionario_productos);
+      console.log("Diccionario productos regalo");
+      console.log(diccionario_productos_regalo);
+      for (const [key, value] of Object.entries(diccionario_productos)) {
+        if ( Object.keys(diccionario_productos_regalo) ) {
+          for ( const [llave_regalo, valor_regalo] of Object.entries(diccionario_productos_regalo) ) {
+            if (key == llave_regalo) {
+              console.log("Que vamos recibiendo");
+              console.log(key);
 
-				if (Object.keys(diccionario_productos_regalo).length > 0) {
+            }
+          }
+        }
+      }
 
-					for (const [key0, value0] of Object.entries(diccionario_productos_regalo)) {
-
-
-							if (lista_regalos.indexOf(key0)) {
-
-                if (value['id_condicion'] == value0['id_condicion'] && value['id'] != value0['id']) {
-
-                  if (value['promos_llevar'] > value0['cantidad']) {
-                    value['promos_llevar'] = value0['cantidad']
-                  }
-                  if (value['promos_llevar'] > 0 && value['promos_llevar'] <= value0['cantidad']) {
-
-                    var restar_promos_llevar = value['promos_llevar'];
-
-                    order.descuento += ( (value0['precio_unitario'] * (value['porcentaje']/100) )* value['promos_llevar']);
-
-                    console.log("Valor antes");
-                    console.log(value0);
-                    console.log(value0['cantidad']);
-  									value0['cantidad'] -= value['promos_llevar'];
-                    console.log("Value 0 despues");
-                    console.log(value0['cantidad']);
-                    value['promos_llevar'] -= restar_promos_llevar;
-
-  								}
-  								else if (value['promos_llevar'] > 0 && value0['cantidad'] > 0 && value['promos_llevar'] > value0['cantidad']){
-
-                    var restar_promos_llevar = value['promos_llevar'];
-                    resta = value0['total'] - (value['cantidad_regalo']*value['promos_llevar']);
-
-                    order.descuento += ( (value0['precio_unitario']* (value['porcentaje']/100) ) * value['promos_llevar']);
-
-                    value['cantidad'] = 0;
-
-  									value['promos_llevar'] -= restar_promos_llevar;
-
-  								}
-
-                }else if (value['id_condicion'] == value0['id_condicion'] && value['id'] == value0['id']) {
-                  var rest_prueba=0;
-                  if (value['promos_llevar'] == value0['cantidad']) {
-                    rest_prueba = Math.trunc(value['promos_llevar'] / 2);
-                    value['promos_llevar'] = rest_prueba
-
-                  }
-
-                  if (value['promos_llevar'] > 0 && value['promos_llevar'] <= value0['cantidad']) {
-
-                    var restar_promos_llevar = value['promos_llevar'];
-
-                    order.descuento += ( (value0['precio_unitario'] * (value['porcentaje']/100) )* value['promos_llevar']);
-
-
-  									value0['cantidad'] -= value['promos_llevar'];
-  									value['promos_llevar'] -= restar_promos_llevar;
-
-  								}
-  								else if (value['promos_llevar'] > 0 && value0['cantidad'] > 0 && value['promos_llevar'] > value0['cantidad']){
-
-                    var restar_promos_llevar = value['promos_llevar'];
-                    resta = value0['total'] - (value['cantidad_regalo']*value['promos_llevar']);
-
-                    order.descuento += ( (value0['precio_unitario']* (value['porcentaje']/100) ) * value['promos_llevar']);
-
-                    value['cantidad'] = 0;
-
-  									value['promos_llevar'] -= restar_promos_llevar;
-
-  								}
-
-
-                }
-
-
-
-							}
-					}
-				}
-
-
-			}
 		} //fin de verificación del tamaño del diccionario_productos
 
 
 
 		if ( Object.keys(diccionario_productos_descuento).length > 0) {
-      // console.log("diccionario_productos_descuento");
-      // console.log(diccionario_productos_descuento);
-      // console.log("diccionario_promos_pedidos");
-      // console.log(diccionario_promos_pedidos);
-      // console.log("_____________________");
+      console.log("diccionario_productos_descuento");
+      console.log(diccionario_productos_descuento);
+      console.log("diccionario_promos_pedidos");
+      console.log(diccionario_promos_pedidos);
+      console.log("_____________________");
       var n=0, n_promocion=0, cantidad_x=0, n1=0;
       var valor_descuento_total=[], diccionario_calculo_descuento={};
       for (const [key1, value1] of Object.entries(diccionario_productos_descuento)) {
@@ -1173,27 +1236,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
           }
 
-          // console.log("diccionario_calculo_descuento");
-          // console.log(diccionario_calculo_descuento);
-
-          // if (value1['promos_llevar'] > 0 && value1['promos_llevar'] <= value1['cantidad'] && value1['n_promocion'].length < 1) {
-          //   console.log("Paso la parte del IF");
-          // 	var restar_promos_llevar = value1['promos_llevar'];
-          //
-          // 	order.descuento += ( (value1['total'] * (value1['descuento']/100) ));
-          //
-          // 	value1['promos_llevar'] -= restar_promos_llevar;
-          //
-          // }
-          // else if(value1['promos_llevar'] > 0 && value1['cantidad'] > 0 && value1['promos_llevar'] > value1['cantidad'] && value1['n_promocion'].length < 1){
-          //   console.log("Paso la parte del else IF");
-          //   var restar_promos_llevar = value1['promos_llevar'];
-          // 	resta = value1['total'] - (value1['cantidad_regalo']*value1['promos_llevar']);
-          // 	order.descuento +=(value1['total'] * (value1['descuento']/100) );
-          // 	value1['cantidad'] = 0;
-          //
-          // 	value1['promos_llevar'] -= restar_promos_llevar;
-          // }
 
         }
 
