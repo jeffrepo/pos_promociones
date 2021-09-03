@@ -491,11 +491,9 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     var producto_regalo_id = this.pos.config.producto_descuento_id;
 
     //--------------Variable para promocion-----------------------------------
-		var promociones = false, horas=false, producto_beneficio= false, productos_promocion=false, diccionario_productos = {}, condicion=false;
-		var promos_llevar = 0, calculo_repetir=false, suma_promos_llevar=0, lista_regalos=false, porcentaje=0, clientes;
-		var resta = 0, cantidad_unitaria_regalo=0,suma_cantidad_regalo=0, precio_unitario=0, producto_regalo =0, cliente=false;
+		var promociones = false, horas=false, clientes, diccionario_producto_regalo_promocion={};
+    var productos_promocion=false, diccionario_productos = {}, cliente=false, condicion=false;
 
-    var producto_beneficio1=false ;
     promociones = self.pos.promocion;
     cliente = order.attributes.client.id;
 
@@ -537,7 +535,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
             if ( (hora_minuto1 >= hora_inic )){
 
-              producto_beneficio = promociones[i].productos_regalo_ids;
               productos_promocion = promociones[i].productos_ids;
 
               clientes = promociones[i].cliente_ids;
@@ -554,22 +551,70 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'id': l.product.id,
                       'cantidad': 0,
                       'promos_llevar': 0,
-                      'listado_regalos': producto_beneficio,
+                      'listado_regalos': {},
                       'cantidad_regalo':0,
                       'porcentaje':0,
-                      'id_condicion': promociones[i].condicion_promocion_ids[0],
+                      'n_promocion_ids':[],
+                      'lineas_ids': [],
+
+                      }
+                    }
+                    console.log("Promos 0");
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
+                      diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'productos_regalo_ids': [],
                       }
                     }
 
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['listado_regalos'])){
+
+                      diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'numero_promocion': promociones[i].pos_condicion_promocion_ids[0]['id'],
+                        'lista_productos_ids':[],
+                      }
+
+                    }
+
+                    for (var prod_bn = 0; prod_bn < promociones[i].productos_regalo_ids.length; prod_bn++) {
+
+                      if (!(diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                        diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].push(promociones[i].productos_regalo_ids[prod_bn])
+                        if (!(diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                          diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].push(promociones[i].productos_regalo_ids[prod_bn]);
+                        }
+                      }
+
+                    }
+
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids']) ) {
+                      if (diccionario_productos[l.product.id]['n_promocion_ids'].length <= 0) {
+                        diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                      }else {
+                        if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids'])) {
+                          if (!(diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[i].pos_condicion_promocion_ids[0]['id']))) {
+                            diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                          }
+
+                        }
+
+                      }
+
+                    }
+
                   }
-                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+
+                  if (l.product.id in diccionario_productos) {
+                    if (!(diccionario_productos[l.product.id]['lineas_ids'].includes(l.id))) {
+                      diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                      diccionario_productos[l.product.id]['lineas_ids'].push(l.id);
+                    }
+                  }
+
                 }
 
               }
               else if (clientes.length <= 0) {
-
                 if ( (productos_promocion.includes(l.product.id) ) ) {
-
                   if ( productos_promocion.includes(l.product.id)) {
 
                     if (!(l.product.id in diccionario_productos )) {
@@ -577,16 +622,63 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'id': l.product.id,
                       'cantidad': 0,
                       'promos_llevar': 0,
-                      'listado_regalos': producto_beneficio,
+                      'listado_regalos': {},
                       'cantidad_regalo':0,
                       'porcentaje':0,
-                      'id_condicion': promociones[i].condicion_promocion_ids[0],
+                      'n_promocion_ids':[],
+                      'lineas_ids': [],
                       }
+                    }
+                    console.log("Promos 1");
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
+                      diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'productos_regalo_ids': [],
+                      }
+                    }
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['listado_regalos'])){
+
+                      diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'numero_promocion': promociones[i].pos_condicion_promocion_ids[0]['id'],
+                        'lista_productos_ids':[],
+                      }
+
+                    }
+                    for (var prod_bn = 0; prod_bn < promociones[i].productos_regalo_ids.length; prod_bn++) {
+
+
+                      if (!(diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                        diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].push(promociones[i].productos_regalo_ids[prod_bn])
+                        if (!(diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                          diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].push(promociones[i].productos_regalo_ids[prod_bn]);
+                        }
+
+                      }
+
+                    }
+
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids']) ) {
+                      if (diccionario_productos[l.product.id]['n_promocion_ids'].length <= 0) {
+                        diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                      }else {
+                        if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids'])) {
+                          if (!(diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[i].pos_condicion_promocion_ids[0]['id']))) {
+                            diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                          }
+
+                        }
+
+                      }
+
                     }
 
                   }
+                  if (l.product.id in diccionario_productos) {
+                    if (!(diccionario_productos[l.product.id]['lineas_ids'].includes(l.id))) {
+                      diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                      diccionario_productos[l.product.id]['lineas_ids'].push(l.id);
+                    }
+                  }
 
-                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
                 }
               }
 
@@ -597,7 +689,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
             if ( (hora_minuto1 <= hora_fina)){
 
-              producto_beneficio = promociones[i].productos_regalo_ids;
               productos_promocion = promociones[i].productos_ids;
 
 
@@ -616,16 +707,66 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'id': l.product.id,
                       'cantidad': 0,
                       'promos_llevar': 0,
-                      'listado_regalos': producto_beneficio,
+                      'listado_regalos': {},
                       'cantidad_regalo':0,
                       'porcentaje':0,
-                      'id_condicion': promociones[i].condicion_promocion_ids[0],
+                      'n_promocion_ids':[],
                       }
+                    }
+
+                    console.log("Promos 2");
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
+                      diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'productos_regalo_ids': [],
+                      }
+                    }
+
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['listado_regalos'])){
+
+                      diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'numero_promocion': promociones[i].pos_condicion_promocion_ids[0]['id'],
+                        'lista_productos_ids':[],
+                      }
+
+                    }
+
+                    for (var prod_bn = 0; prod_bn < promociones[i].productos_regalo_ids.length; prod_bn++) {
+
+
+                      if (!(diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                        diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].push(promociones[i].productos_regalo_ids[prod_bn])
+
+                        if (!(diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                          diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].push(promociones[i].productos_regalo_ids[prod_bn]);
+                        }
+
+                      }
+
+                    }
+
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids']) ) {
+                      if (diccionario_productos[l.product.id]['n_promocion_ids'].length <= 0) {
+                        diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                      }else {
+                        if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids'])) {
+                          if (!(diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[i].pos_condicion_promocion_ids[0]['id']))) {
+                            diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                          }
+
+                        }
+
+                      }
+
                     }
 
                   }
 
-                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                  if (l.product.id in diccionario_productos) {
+                    if (!(diccionario_productos[l.product.id]['lineas_ids'].includes(l.id))) {
+                      diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                      diccionario_productos[l.product.id]['lineas_ids'].push(l.id);
+                    }
+                  }
 
                 }
 
@@ -640,16 +781,63 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'id': l.product.id,
                       'cantidad': 0,
                       'promos_llevar': 0,
-                      'listado_regalos': producto_beneficio,
+                      'listado_regalos': {},
                       'cantidad_regalo':0,
                       'porcentaje':0,
-                      'id_condicion':promociones[i].condicion_promocion_ids[0],
+                      'n_promocion_ids':[],
                       }
+                    }
+                    console.log("Promos 3");
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
+                      diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'productos_regalo_ids': [],
+                      }
+                    }
+
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['listado_regalos'])){
+
+                      diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]={
+                        'numero_promocion': promociones[i].pos_condicion_promocion_ids[0]['id'],
+                        'lista_productos_ids':[],
+                      }
+
+                    }
+
+                    for (var prod_bn = 0; prod_bn < promociones[i].productos_regalo_ids.length; prod_bn++) {
+
+
+                      if (!(diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                        diccionario_productos[l.product.id]['listado_regalos'][promociones[i].pos_condicion_promocion_ids[0]['id']]['lista_productos_ids'].push(promociones[i].productos_regalo_ids[prod_bn])
+                        if (!(diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].includes(promociones[i].productos_regalo_ids[prod_bn]))) {
+                          diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]['productos_regalo_ids'].push(promociones[i].productos_regalo_ids[prod_bn]);
+                        }
+                      }
+
+                    }
+
+                    if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids']) ) {
+                      if (diccionario_productos[l.product.id]['n_promocion_ids'].length <= 0) {
+                        diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                      }else {
+                        if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_productos[l.product.id]['n_promocion_ids'])) {
+                          if (!(diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[i].pos_condicion_promocion_ids[0]['id']))) {
+                            diccionario_productos[l.product.id]['n_promocion_ids'].push(promociones[i].pos_condicion_promocion_ids[0]['id']);
+                          }
+
+                        }
+
+                      }
+
                     }
 
                   }
 
-                  diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                  if (l.product.id in diccionario_productos) {
+                    if (!(diccionario_productos[l.product.id]['lineas_ids'].includes(l.id))) {
+                      diccionario_productos[l.product.id]['cantidad']+=l.get_quantity();
+                      diccionario_productos[l.product.id]['lineas_ids'].push(l.id);
+                    }
+                  }
 
                 }
               }
@@ -665,7 +853,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
     });
 
-    return diccionario_productos;
+    return [diccionario_productos, diccionario_producto_regalo_promocion] ;
   },
 
   button_click: function(){
@@ -677,79 +865,436 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 		order.descuento = 0;
 		//--------------Variable para promocion-----------------------------------
-		var promociones = false, horas=false, producto_beneficio= false, productos_promocion=false, diccionario_productos = {}, condicion=false;
-		var promos_llevar = 0, calculo_repetir=false, suma_promos_llevar=0, lista_regalos=false, porcentaje=0;
-		var resta = 0, cantidad_unitaria_regalo=0,suma_cantidad_regalo=0, precio_unitario=0, producto_regalo =0, productos_benficio=false;
+		var promociones = false, horas=false, productos_promocion=false, diccionario_productos = {}, condicion=false;
+		var suma_promos_llevar=0, lista_regalos=false, porcentaje=0, diccionario_producto_regalo_promocion={};
+		var resta = 0, precio_unitario=0, producto_regalo =0, productos_benficio=false, clave=false, clave2=false;
 
 		var diccionario_productos_regalo={}, producto_beneficio1=false ;
 		promociones = self.pos.promocion;
 
 		//--------------Variable para descuento-----------------------------------
-		var diccionario_productos_descuento = false, diccionario_promos_pedidos = {}, producto_beneficio0=false, productos_promocion0=0;
-		var calculo_repetir0= 0,promos_llevar0=0, nuevo_diccionario={},precio_final=0, sumando_cantidades_descuento=0, new_quantity_discount=0, repeticion_promos=0;
-
+		var diccionario_productos_descuento = false, diccionario_promos_pedidos = {};
+		var calculo_repetir0= 0,promos_llevar0=0, nuevo_diccionario={},precio_final=0, sumando_cantidades_descuento=0, repeticion_promos=0;
+    var diccionario_producto_ambas_promos={};
     diccionario_productos_descuento = self.get_tipo_descuento()[0];
     //diccionario_n_promociones = self.get_tipo_descuento()[1];
-    diccionario_productos = self.get_tipo_promocion();
+    diccionario_productos = self.get_tipo_promocion()[0];
+    diccionario_producto_regalo_promocion = self.get_tipo_promocion()[1];
+    var condicion_general = 0;
 
-		order.get_orderlines().forEach(function(l) {
+    order.get_orderlines().forEach(function(l) {
 			for (var g = 0; g < promociones.length; g++) {
 
-        if (promociones[g].tipo_select == 'promo') {
+        if (promociones[g].pos_condicion_promocion_ids.length > 0) {
+          condicion_general = promociones[g].pos_condicion_promocion_ids[0]['id'];
+        }else if (promociones[g].pos_condicion_descuento_ids.length > 0){
+          condicion_general = promociones[g].pos_condicion_descuento_ids[0]['id'];
+        }
 
-          if (l.product.id in diccionario_productos) {
-            if (diccionario_productos[l.product.id]['id_condicion'] == promociones[g].condicion_promocion_ids[0]) {
+        //diccionario_productos son las promos tipo PROMOCION
+        //diccionario_productos_descuento son las promociones tipo DESCUENTO
+        if (l.product.id in diccionario_productos && l.product.id in diccionario_productos_descuento || condicion_general in diccionario_producto_regalo_promocion && diccionario_producto_regalo_promocion[condicion_general]['productos_regalo_ids'].includes(l.product.id)) {
+          if (l.product.id in diccionario_productos && diccionario_productos[l.product.id]['n_promocion_ids'].includes(condicion_general) || l.product.id in diccionario_productos_descuento && diccionario_productos_descuento[l.product.id]['n_promocion'].includes(condicion_general)) {
+            if (!(condicion_general in diccionario_producto_ambas_promos)) {
+              diccionario_producto_ambas_promos[condicion_general]={
+                'total_descuento':0,
+                'promo':{},
+                'desc':{},
+              }
+            }
 
-              condicion = promociones[g].pos_condicion_promocion_ids;
-              for (var i = 0; i < condicion.length; i++) {
+            if (condicion_general in diccionario_producto_ambas_promos && !(l.product.id in diccionario_producto_ambas_promos[condicion_general])) {
+              diccionario_producto_ambas_promos[condicion_general][l.product.id]={
+                'cantidad':0,
+                'ambos':0,
+                'promos':0,
+                'regalo':0,
+                'descuento':0
+              }
+              if (promociones[g]['tipo_select'] == "promo") {
+                diccionario_producto_ambas_promos[condicion_general]['promo']={
+                  'a_partir':promociones[g]['pos_condicion_promocion_ids'][0]['a_partir'],
+                  'regalo':promociones[g]['pos_condicion_promocion_ids'][0]['promocion'],
+                  'porcentaje':promociones[g]['pos_condicion_promocion_ids'][0]['porcentaje'],
+                }
+              }else if (promociones[g]['tipo_select'] == "desc") {
+                diccionario_producto_ambas_promos[condicion_general]['desc']={
+                  'a_partir':promociones[g]['pos_condicion_descuento_ids'][0]['partir_de'],
+                  'porcentaje':promociones[g]['pos_condicion_descuento_ids'][0]['descuento'],
+                }
+              }
+            }
 
-                if ( Object.keys(diccionario_productos).length > 0) {
+            if (condicion_general in diccionario_producto_ambas_promos && l.product.id in diccionario_producto_ambas_promos[condicion_general]) {
 
-                  if (l.product.id in diccionario_productos) {
-
-                    if ( l.product.id == diccionario_productos[l.product.id]['id']) {
-
-                      if (condicion[i].a_partir == 1 && condicion[i].promocion == 1) {
-                        calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (1) ).toFixed(2);
-                      }else {
-                        calculo_repetir = Number(diccionario_productos[l.product.id]['cantidad'] / (condicion[i].a_partir) ).toFixed(2);
-                      }
-
-                      promos_llevar = Math.trunc(calculo_repetir);
-                      diccionario_productos[l.product.id]['promos_llevar']=promos_llevar;
-                      diccionario_productos[l.product.id]['cantidad_regalo']=condicion[i].promocion;
-                      diccionario_productos[l.product.id]['porcentaje']=condicion[i].porcentaje;
-
-
-                    }
-
-                  }
-
+              if (l.product.id in diccionario_producto_ambas_promos[condicion_general]) {
+                if (l.product.id in diccionario_productos && condicion_general in diccionario_productos[l.product.id]['listado_regalos'] && diccionario_productos[l.product.id]['listado_regalos'][condicion_general]['lista_productos_ids'].includes(l.product.id)) {
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['ambos'] = 1;
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['cantidad']=diccionario_productos[l.product.id]['cantidad'];
+                }else if (diccionario_producto_ambas_promos[condicion_general][l.product.id]['regalo'] <= 0 && promociones[g]['tipo_select'] != 'desc') {
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['promos']=1;
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['cantidad']=diccionario_productos[l.product.id]['cantidad'];
+                }else if (promociones[g]['tipo_select'] == 'desc') {
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['cantidad'] = diccionario_productos_descuento[l.product.id]['cantidad'];
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['descuento'] = 1;
                 }
 
               }
 
             }
 
-          }
 
-
-          producto_beneficio1 = promociones[g].productos_regalo_ids;
-          if (producto_beneficio1.includes(l.product.id)) {
-            if (diccionario_productos_regalo.hasOwnProperty(l.product.id) == false ) {
-
-              diccionario_productos_regalo[l.product.id]={
-                'id': l.product.id,
-                'cantidad': 0,
-                'total':0,
-                'precio_unitario': 0,
-                'id_condicion': promociones[g].condicion_promocion_ids[0],
-              };
+          }else if ( condicion_general in diccionario_producto_regalo_promocion && diccionario_producto_regalo_promocion[condicion_general]['productos_regalo_ids'].includes(l.product.id)) {
+            if (!(condicion_general in diccionario_producto_ambas_promos)) {
+              diccionario_producto_ambas_promos[condicion_general]={
+                'total_descuento':0,
+                'promo':{},
+                'desc':{},
+              }
             }
-            diccionario_productos_regalo[l.product.id]['cantidad'] += l.get_quantity();
-            diccionario_productos_regalo[l.product.id]['total'] +=l.get_base_price();
+
+            if (condicion_general in diccionario_producto_ambas_promos && !(l.product.id in diccionario_producto_ambas_promos[condicion_general])) {
+              diccionario_producto_ambas_promos[condicion_general][l.product.id]={
+                'cantidad':0,
+                'ambos':0,
+                'promos':0,
+                'regalo':0,
+                'descuento':0,
+                'lineas_ids':[],
+              }
+            }
+
+            if (condicion_general in diccionario_producto_ambas_promos && l.product.id in diccionario_producto_ambas_promos[condicion_general]) {
+              if (l.product.id in diccionario_producto_ambas_promos[condicion_general]) {
+                if (l.product.id in diccionario_productos && condicion_general in diccionario_productos[l.product.id]['listado_regalos'] && diccionario_productos[l.product.id]['listado_regalos'][condicion_general]['lista_productos_ids'].includes(l.product.id)) {
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['ambos'] = 1;
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['cantidad'] += l.get_quantity();
+                } else if (diccionario_producto_ambas_promos[condicion_general][l.product.id]['promos'] <= 0 && promociones[g]['tipo_select'] != 'desc') {
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['regalo']=1;
+                  if (!(diccionario_producto_ambas_promos[condicion_general][l.product.id]['lineas_ids'].includes(l.id))) {
+                    diccionario_producto_ambas_promos[condicion_general][l.product.id]['cantidad'] += l.get_quantity();
+                    diccionario_producto_ambas_promos[condicion_general][l.product.id]['lineas_ids'].push(l.id);
+                  }
+                }else if(diccionario_producto_ambas_promos[condicion_general][l.product.id]['promos'] >= 1 && promociones[g]['tipo_select'] != 'desc'){
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['promos']=0;
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['ambos']=1;
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['cantidad'] += l.get_quantity();
+                }else if (promociones[g]['tipo_select'] == 'desc') {
+                  diccionario_producto_ambas_promos[condicion_general][l.product.id]['descuento']=1;
+                }
+
+              }
+            }
+
+
 
           }
+
+        }else{
+          console.log(".");
+          // console.log("Productos que no estan en las dos promociones ");
+          // console.log(l.product.display_name);
+          // console.log(l.product.id);
+
+        }
+
+        if (promociones[g].tipo_select == 'promo') {
+          condicion = promociones[g].pos_condicion_promocion_ids;
+
+          if (l.product.id in diccionario_productos) {
+
+            if (diccionario_productos[l.product.id]['n_promocion_ids'].length > 1) {
+
+              if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(condicion[0]['id']) ) {
+
+                if (diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'].includes(l.product.id)) { // Si el producto esta en la parte de promocion y de regalo hace todo el proceso
+
+                  if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[g].condicion_promocion_ids[0])) {
+                      if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+                        diccionario_promos_pedidos[condicion[0]['id']]={
+                          'cantidad_total_regalo':0,
+                          'total':l.get_unit_price(),
+                          'a_partir': condicion[0]['a_partir'],
+                          'cantidad_regalo': condicion[0]['promocion'],
+                          'porcentaje_descuento': condicion[0]['porcentaje'],
+                          'cantidad_promo_unificada': (condicion[0]['a_partir'] + condicion[0]['promocion']),
+                          'calculo_repetir':0,
+                          'total_descuento':0,
+                          'productos_ids': [],
+                          'lineas_ids':[],
+                          'productos_condicion_ids':[],
+                          'productos_regalo_ids':[],
+                          'cantidad_base':0,
+                          'cantidad_unica_promo':0,
+                          'listado_regalos':diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'],
+                          'estado':false,
+                        }
+
+                      }
+                  }
+
+                  if (condicion[0]['id'] in diccionario_promos_pedidos) {
+                    if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                      diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos[l.product.id]['cantidad'];
+                      var calculo =0;
+                      if (diccionario_promos_pedidos[condicion[0]['id']]['productos_regalo_ids'].length <= 0) {
+                        if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] >= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']) {
+                          if (diccionario_promos_pedidos[condicion[0]['id']]['productos_condicion_ids'].length ==0) {
+                            calculo = Math.trunc(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] / diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada']);
+                            diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] += (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo'] * calculo);
+                            diccionario_promos_pedidos[condicion[0]['id']]['estado'] = true;
+                          }
+
+                        }
+                      }
+                      diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+
+                    }
+                  }
+
+
+
+
+                }else { //Si el producto solo esta en la parte de promocion
+
+                  if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[g].condicion_promocion_ids[0])) {
+                      if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+
+                        diccionario_promos_pedidos[condicion[0]['id']]={
+                          'cantidad_total_regalo':0,
+                          'total':l.get_unit_price(),
+                          'a_partir': condicion[0]['a_partir'],
+                          'cantidad_regalo': condicion[0]['promocion'],
+                          'porcentaje_descuento': condicion[0]['porcentaje'],
+                          'cantidad_promo_unificada': (condicion[0]['a_partir'] + condicion[0]['promocion']),
+                          'calculo_repetir':0,
+                          'total_descuento':0,
+                          'productos_ids': [],
+                          'lineas_ids':[],
+                          'productos_condicion_ids':[],
+                          'productos_regalo_ids':[],
+                          'cantidad_base':0,
+                          'cantidad_unica_promo':0,
+                          'listado_regalos':diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'],
+                          'estado':false,
+                        }
+
+                      }
+                  }
+
+                  if (condicion[0]['id'] in diccionario_promos_pedidos) {
+                    if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                      diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'] += diccionario_productos[l.product.id]['cantidad'];
+                      diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                      diccionario_promos_pedidos[condicion[0]['id']]['productos_condicion_ids'].push(l.product.id);
+                    }
+                  }
+
+                }
+
+
+              }
+
+
+
+            }
+            else if (diccionario_productos[l.product.id]['n_promocion_ids'].length == 1){
+              if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(condicion[0]['id'])) {
+                if (diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'].includes(l.product.id)) { // Si el producto esta en la parte de promocion y de regalo hace todo el proceso
+                  if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[g].condicion_promocion_ids[0])) {
+                      if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+
+                        diccionario_promos_pedidos[condicion[0]['id']]={
+                          'cantidad_total_regalo':0,
+                          'total':l.get_unit_price(),
+                          'a_partir': condicion[0]['a_partir'],
+                          'cantidad_regalo': condicion[0]['promocion'],
+                          'porcentaje_descuento': condicion[0]['porcentaje'],
+                          'cantidad_promo_unificada': (condicion[0]['a_partir'] + condicion[0]['promocion']),
+                          'calculo_repetir':0,
+                          'total_descuento':0,
+                          'productos_ids': [],
+                          'lineas_ids':[],
+                          'productos_condicion_ids':[],
+                          'productos_regalo_ids':[],
+                          'cantidad_base':0,
+                          'cantidad_unica_promo':0,
+                          'listado_regalos':diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'],
+                          'estado':false,
+                        }
+
+                      }
+                  }
+                  if (condicion[0]['id'] in diccionario_promos_pedidos) {
+                    if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                      diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos[l.product.id]['cantidad'];
+                      var calculo =0;
+                      if (diccionario_promos_pedidos[condicion[0]['id']]['productos_regalo_ids'].length <= 0) {
+                        if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] >= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']) {
+                          if (diccionario_promos_pedidos[condicion[0]['id']]['productos_condicion_ids'].length ==0) {
+                            calculo = Math.trunc(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] / diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada']);
+                            diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] += (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo'] * calculo);
+                            diccionario_promos_pedidos[condicion[0]['id']]['estado'] = true;
+                          }
+
+                        }
+                      }
+                      diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+
+                    }
+                  }
+
+
+
+
+                }else { //Si el producto solo esta en la parte de promocion
+
+                  if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[g].condicion_promocion_ids[0])) {
+                      if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+                        diccionario_promos_pedidos[condicion[0]['id']]={
+                          'cantidad_total_regalo':0,
+                          'total':l.get_unit_price(),
+                          'a_partir': condicion[0]['a_partir'],
+                          'cantidad_regalo': condicion[0]['promocion'],
+                          'porcentaje_descuento': condicion[0]['porcentaje'],
+                          'cantidad_promo_unificada': (condicion[0]['a_partir'] + condicion[0]['promocion']),
+                          'calculo_repetir':0,
+                          'total_descuento':0,
+                          'productos_ids': [],
+                          'lineas_ids':[],
+                          'productos_condicion_ids':[],
+                          'productos_regalo_ids':[],
+                          'cantidad_base':0,
+                          'cantidad_unica_promo':0,
+                          'listado_regalos':diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'],
+                          'estado':false,
+                        }
+
+                      }
+                  }
+
+                  if (condicion[0]['id'] in diccionario_promos_pedidos) {
+                    if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
+                      diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'] += diccionario_productos[l.product.id]['cantidad'];
+                      diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
+                      diccionario_promos_pedidos[condicion[0]['id']]['productos_condicion_ids'].push(l.product.id);
+                    }
+                  }
+
+                }
+
+              }
+
+
+
+            }
+
+          }else if (condicion[0]['id'] in diccionario_producto_regalo_promocion && diccionario_producto_regalo_promocion[condicion[0]['id']]['productos_regalo_ids'].includes(l.product.id)) {
+            if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+              diccionario_promos_pedidos[condicion[0]['id']]={
+                'cantidad_total_regalo':0,
+                'total':l.get_unit_price(),
+                'a_partir': condicion[0]['a_partir'],
+                'cantidad_regalo': condicion[0]['promocion'],
+                'porcentaje_descuento': condicion[0]['porcentaje'],
+                'cantidad_promo_unificada': (condicion[0]['a_partir'] + condicion[0]['promocion']),
+                'calculo_repetir':0,
+                'total_descuento':0,
+                'productos_ids': [],
+                'lineas_ids':[],
+                'productos_condicion_ids':[],
+                'productos_regalo_ids':[],
+                'cantidad_base':0,
+                'cantidad_unica_promo':0,
+                'listado_regalos':diccionario_producto_regalo_promocion[condicion[0]['id']]['productos_regalo_ids'],
+                'estado':false,
+              }
+
+            }
+
+            if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_regalo_ids'].includes(l.product.id))) {
+              if (diccionario_promos_pedidos[condicion[0]['id']]['estado']==true) {
+                diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo']=0;
+              }
+              diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] += l.get_quantity();
+              diccionario_promos_pedidos[condicion[0]['id']]['productos_regalo_ids'].push(l.product.id);
+              diccionario_promos_pedidos[condicion[0]['id']]['lineas_ids'].push(l.id);
+
+            }else if(!(diccionario_promos_pedidos[condicion[0]['id']]['lineas_ids'].includes(l.id))){
+              diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo']+= l.get_quantity();
+              diccionario_promos_pedidos[condicion[0]['id']]['lineas_ids'].push(l.id);
+
+            }
+
+
+          }
+
+          if (condicion[0]['id'] in diccionario_promos_pedidos) {
+            var calculo = 0, parte_total=0, cantidad_unica=0, cantidad_unica_regalo=0;
+            if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'] >= diccionario_promos_pedidos[condicion[0]['id']]['a_partir']) {
+              if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] >= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']) {
+                var productos_individuales = 0;
+                cantidad_unica = diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'];
+                cantidad_unica_regalo = diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'];
+                while ( cantidad_unica >= diccionario_promos_pedidos[condicion[0]['id']]['a_partir'] && cantidad_unica_regalo >= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo'] ) {
+                  cantidad_unica -= diccionario_promos_pedidos[condicion[0]['id']]['a_partir'];
+                  cantidad_unica_regalo -= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo'];
+                  productos_individuales += diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo'];
+                }
+
+                diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = ((productos_individuales * diccionario_promos_pedidos[condicion[0]['id']]['total'])*(diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100))
+
+              }
+            }
+
+            if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] == diccionario_promos_pedidos[condicion[0]['id']]['a_partir']) {
+              if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] > diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']) {
+                diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = ((diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']* diccionario_promos_pedidos[condicion[0]['id']]['total']) * (diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100));
+              }else if(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] <= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']){
+                diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = ((diccionario_promos_pedidos[condicion[0]['id']]['total']*diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo']) * (diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100));
+              }
+            }else if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] >= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada'] && diccionario_promos_pedidos[condicion[0]['id']]['productos_regalo_ids'].length > 0) {
+              if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'] >= 0) {
+                var calculo2=0, sobrante = 0, regalos_unicos=0, sumar_regalo=0, cantidad_total_regalo = 0;
+
+                calculo = Math.trunc(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] / diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada']);
+
+                diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir'] = calculo;
+
+                if (clave == false) {
+                  diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = (diccionario_promos_pedidos[condicion[0]['id']]['total'] * (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']*diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir']))*(diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100);
+                  clave = true;
+                }
+
+                calculo2 = diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] - diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir'];
+
+                sobrante = calculo2 - diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir'];
+                cantidad_total_regalo = diccionario_promos_pedidos[condicion[0]['id']]['cantidad_total_regalo'];
+                sumar_regalo = sobrante + cantidad_total_regalo;
+
+                if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'] > 0 && clave2== false) {
+                  calculo = 0;
+                  if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'] == 1) {
+                    calculo = 1;
+                  }else{
+                    calculo = Math.trunc(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_unica_promo'] / diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada']);
+                  }
+                  diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] += ((diccionario_promos_pedidos[condicion[0]['id']]['total']*(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo'] * calculo))*( diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100));
+                }
+
+              }
+
+            }else if (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] >= diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada'] && diccionario_promos_pedidos[condicion[0]['id']]['productos_regalo_ids'].length == 0){
+              calculo = Math.trunc(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] / diccionario_promos_pedidos[condicion[0]['id']]['cantidad_promo_unificada'])
+
+              diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir'] = calculo;
+
+              diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = (diccionario_promos_pedidos[condicion[0]['id']]['total'] * (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']*diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir']))*(diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100);
+            }
+
+
+          }
+
 
 				}
 
@@ -1030,13 +1575,9 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                               }
                             }
                             if (!(diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].includes(l.product.id))) {
-                              console.log("Los productos ::");
-                              console.log(l.product.display_name);
-                              console.log(l.product.id);
-                              console.log(diccionario_productos_descuento[l.product.id]['cantidad']);
                               diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base'] += diccionario_productos_descuento[l.product.id]['cantidad'];
                               diccionario_promos_pedidos[condicion[0]['id']]['productos_ids'].push(l.product.id);
-                              console.log(diccionario_promos_pedidos[condicion[0]['id']]['cantidad_base']);
+
                             }
 
                             if (condicion[0]['id'] in diccionario_promos_pedidos) {
@@ -1091,8 +1632,29 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 		});
 
 
+    if (Object.keys(diccionario_producto_ambas_promos).length > 0) {
+      console.log("diccionario_producto_ambas_promos");
+      console.log(diccionario_producto_ambas_promos);
+      for (const [llave_general, valores_generales] of Object.entries(diccionario_producto_ambas_promos)) {
+        if (Object.keys(valores_generales['promo']).length > 0) {
+          console.log("Valores con tipo promo");
+        }
+        if (Object.keys(valores_generales['desc']).length > 0) {
+          var valor_suma = 0;
 
+          for (const [key_v, val_valores] of Object.entries(valores_generales)) {
+            console.log("---------------------------------");
+            console.log(val_valores['cantidad']);
+            console.log(val_valores['a_partir']);
+            console.log(val_valores['porcentaje']);
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          }
 
+        }
+
+      }
+
+    }
     //Veficando el tamaño de los diccionarios para proceder con los calculos de tipo promoción o descuento
 
 		if ( Object.keys(diccionario_productos).length > 0) {
@@ -1100,6 +1662,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
       console.log(diccionario_productos);
       console.log("Diccionario productos regalo");
       console.log(diccionario_productos_regalo);
+      console.log(diccionario_promos_pedidos);
+      console.log("_____________________");
       for (const [key, value] of Object.entries(diccionario_productos)) {
         if ( Object.keys(diccionario_productos_regalo) ) {
           for ( const [llave_regalo, valor_regalo] of Object.entries(diccionario_productos_regalo) ) {
