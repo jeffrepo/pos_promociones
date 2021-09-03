@@ -882,7 +882,68 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     diccionario_producto_regalo_promocion = self.get_tipo_promocion()[1];
     var condicion_general = 0;
 
+    //d_tipo_promocion contiene productos que este nen tipo PROMOCION
+    //d_tipo_descuento contiene productos que este nen tipo DESCUENTO
+    var d_tipo_promocion = {};
+    var d_tipo_descuento = {};
+
+    console.log('condiciones inicio')
+    console.log(promociones)
+
+    //informacion de tipo promocion sobre apartir, descuento y regalo
+    var info_tipo_promocion = {}
     order.get_orderlines().forEach(function(l) {
+      promociones.forEach(function(loop_promo) {
+        //SI EL PRODUCTO ESTA EN TIPO "PROMOCION LO AGREGA AL DIC"
+        if (loop_promo.tipo_select=="promo"){
+            //SI NO EXISTE LA PROMOCION LA AGREGAMOS
+            if (!(loop_promo.id in d_tipo_promocion)){
+                d_tipo_promocion[loop_promo.id]= {}
+            }
+            //llenamos la informacion
+            if (!(loop_promo.id in info_tipo_promocion)){
+                info_tipo_promocion[loop_promo.id]= {'a_partir': loop_promo['pos_condicion_promocion_ids'][0]['a_partir'],
+                  'promocion': loop_promo['pos_condicion_promocion_ids'][0]['promocion'],
+                  'porcentaje': loop_promo['pos_condicion_promocion_ids'][0]['porcentaje'],
+                  'descuento': 0}
+            }
+
+            //SI EL PRODCTO ESTA EN LA PROMOCION LO AGREGAMOS
+            if (!(l.product.id in d_tipo_promocion[loop_promo.id])){
+                d_tipo_promocion[loop_promo.id][l.product.id] = {'ambos': 0, 'promocion':0,'regalo': 0, 'precio_unitario': l.get_unit_price()}
+            }
+
+            //SI EL PRODUCTO ESTA EN ambos
+            var ambas_condiciones = 0;
+            if (loop_promo.productos_ids.includes(l.product.id) && loop_promo.productos_regalo_ids.includes(l.product.id)){
+                d_tipo_promocion[loop_promo.id][l.product.id]['ambos'] += l.get_quantity()
+            //SI EL PRODUCTO ESTA EN PROMOCION
+            }else if (loop_promo.productos_ids.includes(l.product.id)) {
+                d_tipo_promocion[loop_promo.id][l.product.id]['promocion'] += l.get_quantity()
+            //SI EL PRODUCTO ES REGALO
+            }else if (loop_promo.productos_regalo_ids.includes(l.product.id)) {
+                d_tipo_promocion[loop_promo.id][l.product.id]['regalo'] += l.get_quantity()
+            }
+
+        }
+
+        //SI EL PRODUCTO ESTA EN TIPO "DESCUENTO LO AGREGA AL DIC"
+        if (loop_promo.tipo_select=="desc"){
+          //SI NO EXISTE LA PROMOCION LA AGREGAMOS
+           if (!(loop_promo.id in d_tipo_descuento)){
+             d_tipo_descuento[loop_promo.id]= {}
+          }
+
+          //SI EL PRODCTO ESTA EN LA PROMOCION LO AGREGAMOS
+          if (!(l.product.id in d_tipo_descuento[loop_promo.id])){
+              d_tipo_descuento[loop_promo.id][l.product.id] = {'ambos': 0, 'promocion':0,'regalo': 0}
+          }
+
+        }
+
+      });
+
+
 			for (var g = 0; g < promociones.length; g++) {
 
         if (promociones[g].pos_condicion_promocion_ids.length > 0) {
@@ -998,19 +1059,23 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
         }
 
+        console.log('testjef')
+        console.log(g)
+        console.log(promociones[g])
         if (promociones[g].tipo_select == 'promo') {
           condicion = promociones[g].pos_condicion_promocion_ids;
 
           if (l.product.id in diccionario_productos) {
 
             if (diccionario_productos[l.product.id]['n_promocion_ids'].length > 1) {
-
+                console.log('entra por tener 2 promos')
+                console.log(condicion[0]['id']);
               if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(condicion[0]['id']) ) {
 
                 if (diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'].includes(l.product.id)) { // Si el producto esta en la parte de promocion y de regalo hace todo el proceso
 
                   if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(promociones[g].condicion_promocion_ids[0])) {
-                      if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {
+                      if ( !(condicion[0]['id'] in diccionario_promos_pedidos) ) {productos_benficio
                         diccionario_promos_pedidos[condicion[0]['id']]={
                           'cantidad_total_regalo':0,
                           'total':l.get_unit_price(),
@@ -1290,6 +1355,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
               diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir'] = calculo;
 
               diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = (diccionario_promos_pedidos[condicion[0]['id']]['total'] * (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']*diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir']))*(diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100);
+              console.log('ttal')
+              console.log(diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'])
             }
 
 
@@ -1630,7 +1697,65 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 			}
 		});
+    console.log('_______________*************')
+    console.log(d_tipo_promocion)
+    console.log(d_tipo_descuento)
+    var tipo_promocion_comun = {}
 
+    if (d_tipo_promocion){
+        //RECPRREMOS CADA PROMOCION
+        Object.keys(d_tipo_promocion).forEach(function(id_promo) {
+            //VERIFICAMOS SI CONTIENE PRODUCTOS LA PROMOCION
+            if(d_tipo_promocion[id_promo]){
+
+                var ambos_total = 0;
+                var promocion_total = 0;
+                var regalo_total = 0;
+                var precio_unitario = 0;
+                //SI TIENE PRODUCTOS RECORREMOS PARA VER LOS PRODUCTOS
+                Object.keys(d_tipo_promocion[id_promo]).forEach(function(id_producto) {
+                    precio_unitario = d_tipo_promocion[id_promo][id_producto]['precio_unitario']
+                    ambos_total += d_tipo_promocion[id_promo][id_producto]['ambos']
+                    promocion_total += d_tipo_promocion[id_promo][id_producto]['promocion'];
+                    regalo_total += d_tipo_promocion[id_promo][id_producto]['regalo'];
+                });
+
+                var productos_aplicados = 0;
+                var sobrante = 0;
+                var promocion = 0;
+                var regalo = 0;
+
+                //pasamos a variable, este indica la canitdad que me puedo llevar de PROMOCION
+                var a_partir_de = info_tipo_promocion[id_promo]['a_partir']
+                //pasamos a variable, este indica la canitdad que me puedo llevar de regalo con un % etc
+                var promocion_de = info_tipo_promocion[id_promo]['promocion']
+
+                //comparamos si esta en ambos
+                if (ambos_total >=  a_partir_de + promocion_de){
+                    console.log('si es mayor igual')
+                    productos_aplicados = ambos_total -  Math.trunc(ambos_total / (info_tipo_promocion[id_promo]['a_partir'] + info_tipo_promocion[id_promo]['promocion']));
+                    sobrante = ambos_total - productos_aplicados
+                    console.log(productos_aplicados)
+                }else{
+                    sobrante += ambos_total
+                }
+                //comparamos si esta em promocion
+                var productos_individuales = 0;
+                regalo_total += sobrante
+                if (promocion_total >= a_partir_de && regalo_total >= promocion_de){
+                  while (promocion_total >= a_partir_de && regalo_total >= promocion_de){
+                      promocion_total -= a_partir_de
+                      regalo_total -= promocion_de
+                      productos_individuales += (a_partir_de + promocion_de)
+                  }
+                }
+                productos_individuales += productos_aplicados
+                productos_individuales = Math.trunc(productos_individuales / (info_tipo_promocion[id_promo]['a_partir'] + info_tipo_promocion[id_promo]['promocion']))
+                var descuento_promocion =( productos_individuales * precio_unitario) * (info_tipo_promocion[id_promo]['porcentaje'] / 100)
+                console.log(descuento_promocion)
+            }
+        });
+    }
 
     if (Object.keys(diccionario_producto_ambas_promos).length > 0) {
       console.log("diccionario_producto_ambas_promos");
