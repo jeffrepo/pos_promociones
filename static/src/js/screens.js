@@ -910,7 +910,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
             //SI EL PRODCTO ESTA EN LA PROMOCION LO AGREGAMOS
             if (!(l.product.id in d_tipo_promocion[loop_promo.id])){
-                d_tipo_promocion[loop_promo.id][l.product.id] = {'ambos': 0, 'promocion':0,'regalo': 0, 'precio_unitario': l.get_unit_price()}
+                d_tipo_promocion[loop_promo.id][l.product.id] = {'ambos': 0, 'promocion':0,'regalo': 0, 'precio_unitario': l.get_unit_price(), 'precio_descuento':0}
             }
 
             //SI EL PRODUCTO ESTA EN ambos
@@ -1068,8 +1068,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
           if (l.product.id in diccionario_productos) {
 
             if (diccionario_productos[l.product.id]['n_promocion_ids'].length > 1) {
-                console.log('entra por tener 2 promos')
-                console.log(condicion[0]['id']);
+                // console.log('entra por tener 2 promos')
+                // console.log(condicion[0]['id']);
               if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(condicion[0]['id']) ) {
 
                 if (diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'].includes(l.product.id)) { // Si el producto esta en la parte de promocion y de regalo hace todo el proceso
@@ -1718,6 +1718,9 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                     ambos_total += d_tipo_promocion[id_promo][id_producto]['ambos']
                     promocion_total += d_tipo_promocion[id_promo][id_producto]['promocion'];
                     regalo_total += d_tipo_promocion[id_promo][id_producto]['regalo'];
+                    if (d_tipo_promocion[id_promo][id_producto]['regalo'] >= info_tipo_promocion[id_promo]['promocion']) {
+                      d_tipo_promocion[id_promo][id_producto]['precio_descuento'] = ((d_tipo_promocion[id_promo][id_producto]['regalo']* d_tipo_promocion[id_promo][id_producto]['precio_unitario']) * (info_tipo_promocion[id_promo]['porcentaje']/100))
+                    }
                 });
 
                 var productos_aplicados = 0;
@@ -1741,7 +1744,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                 }
                 //comparamos si esta em promocion
                 var productos_individuales = 0;
-                regalo_total += sobrante
+                promocion_total += sobrante
                 if (promocion_total >= a_partir_de && regalo_total >= promocion_de){
                   while (promocion_total >= a_partir_de && regalo_total >= promocion_de){
                       promocion_total -= a_partir_de
@@ -1752,6 +1755,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                 productos_individuales += productos_aplicados
                 productos_individuales = Math.trunc(productos_individuales / (info_tipo_promocion[id_promo]['a_partir'] + info_tipo_promocion[id_promo]['promocion']))
                 var descuento_promocion =( productos_individuales * precio_unitario) * (info_tipo_promocion[id_promo]['porcentaje'] / 100)
+                console.log("descuento_promocion");
                 console.log(descuento_promocion)
             }
         });
@@ -1767,13 +1771,13 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
         if (Object.keys(valores_generales['desc']).length > 0) {
           var valor_suma = 0;
 
-          for (const [key_v, val_valores] of Object.entries(valores_generales)) {
-            console.log("---------------------------------");
-            console.log(val_valores['cantidad']);
-            console.log(val_valores['a_partir']);
-            console.log(val_valores['porcentaje']);
-            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-          }
+          // for (const [key_v, val_valores] of Object.entries(valores_generales)) {
+          //   console.log("---------------------------------");
+          //   console.log(val_valores['cantidad']);
+          //   console.log(val_valores['a_partir']);
+          //   console.log(val_valores['porcentaje']);
+          //   console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          // }
 
         }
 
