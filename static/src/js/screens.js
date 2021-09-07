@@ -229,7 +229,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                     }
 
                   }
-                  console.log("Geordie estoy aquí ");
 
                   if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
                     if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
@@ -887,8 +886,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     var d_tipo_promocion = {};
     var d_tipo_descuento = {};
 
-    console.log('condiciones inicio')
-    console.log(promociones)
+    // console.log('condiciones inicio')
+    // console.log(promociones)
 
     //informacion de tipo promocion sobre apartir, descuento y regalo
     var info_tipo_promocion = {}
@@ -1352,8 +1351,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
               diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir'] = calculo;
 
               diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'] = (diccionario_promos_pedidos[condicion[0]['id']]['total'] * (diccionario_promos_pedidos[condicion[0]['id']]['cantidad_regalo']*diccionario_promos_pedidos[condicion[0]['id']]['calculo_repetir']))*(diccionario_promos_pedidos[condicion[0]['id']]['porcentaje_descuento']/100);
-              console.log('ttal')
-              console.log(diccionario_promos_pedidos[condicion[0]['id']]['total_descuento'])
+
             }
 
 
@@ -1919,8 +1917,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       }
                     }
                 });
-                console.log('combinacion promocion')
-                console.log(combinaciones)
+                // console.log('combinacion promocion')
+                // console.log(combinaciones)
             }
         });
     }
@@ -1962,19 +1960,16 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
       }
 
-      console.log("Esto manda :C");
-      console.log(productos_repetidos);
-
     }
 
     //Veficando el tamaño de los diccionarios para proceder con los calculos de tipo promoción o descuento
 
 		if ( Object.keys(diccionario_productos_descuento).length > 0) {
-      console.log("diccionario_productos_descuento");
-      console.log(diccionario_productos_descuento);
-      console.log("diccionario_promos_pedidos");
-      console.log(diccionario_promos_pedidos);
-      console.log("_____________________");
+      // console.log("diccionario_productos_descuento");
+      // console.log(diccionario_productos_descuento);
+      // console.log("diccionario_promos_pedidos");
+      // console.log(diccionario_promos_pedidos);
+      // console.log("_____________________");
       var n=0, n_promocion=0, cantidad_x=0, n1=0;
       var valor_descuento_total=[], diccionario_calculo_descuento={};
       for (const [key1, value1] of Object.entries(diccionario_productos_descuento)) {
@@ -2119,10 +2114,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 		}//Fin de la verificación del tamaño del diccionario_productos_descuento
 
     if (productos_repetidos) {
-      console.log("Ya me quiero ir :c");
       for (const [llave_repetida, valor_repetido] of Object.entries(productos_repetidos)) {
-        console.log("Que pumas >:(");
-        console.log(valor_repetido);
         order.descuento += valor_repetido['valor_ganador'];
       };
     }
