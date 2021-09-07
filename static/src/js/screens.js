@@ -1728,6 +1728,13 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                         beneficio_total = {'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario'] , 'cantidad': d_tipo_promocion[id_promo][id_producto]['beneficio']};
                         // console.log('beneficio_total')
                         // console.log(beneficio_total)
+                    }else{
+                        if (d_tipo_promocion[id_promo][id_producto]['ambos'] >= (info_a_partir + info_cantidad_promocion) && promocion_total > 0){
+                            d_tipo_promocion[id_promo][id_producto]['ambos']  -= info_cantidad_promocion
+                            d_tipo_promocion[id_promo][id_producto]['beneficio'] += info_cantidad_promocion
+                            beneficio_total = {'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario'] , 'cantidad': info_cantidad_promocion};
+
+                        }
                     }
 
                     if (d_tipo_promocion[id_promo][id_producto]['promocion'] >0){
@@ -1736,8 +1743,14 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                         // console.log(promocion_total)
                     }
 
+                    // console.log('AMBOS ' + id_promo.toString())
+                    // console.log(d_tipo_promocion[id_promo][id_producto]['ambos'])
+                    // console.log(info_a_partir)
+                    // console.log()
 
-                    if (d_tipo_promocion[id_promo][id_producto]['ambos'] >= (info_a_partir + info_cantidad_promocion) ){
+
+
+                    if (d_tipo_promocion[id_promo][id_producto]['ambos'] >= (info_a_partir + info_cantidad_promocion) && promocion_total == 0){
                         var descuentos =  Math.trunc(d_tipo_promocion[id_promo][id_producto]['ambos'] /(info_a_partir + info_cantidad_promocion))
                         sobrante = d_tipo_promocion[id_promo][id_producto]['ambos'] - (descuentos * (info_a_partir + info_cantidad_promocion))
                         // console.log('descuentos')
@@ -1757,6 +1770,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                         descuento_push = (descuentos * d_tipo_promocion[id_promo][id_producto]['precio_unitario'])*(info_porcentaje/100)
 
                         // console.log('descuento_push')
+                        // console.log(descuentos)
+                        // console.log(d_tipo_promocion[id_promo][id_producto]['precio_unitario'])
                         // console.log(descuento_push)
                         if(descuento_push > 0){
 
@@ -1774,28 +1789,31 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                             combinaciones[id_promo][id_producto] = descuento_push;
                         }
 
-                    }else if (d_tipo_promocion[id_promo][id_producto]['ambos'] > 0) {
+                    }else {
+                        if (d_tipo_promocion[id_promo][id_producto]['ambos'] > 0) {
 
-                        // console.log('AMBOS ANTES')
-                        // console.log(ambos_total)
-                        if (!(id_producto in ambos_total)){
-                            ambos_total[id_producto] = {'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario'], 'cantidad':0};
+                          // console.log('AMBOS ANTES')
+                          // console.log(ambos_total)
+                          if (!(id_producto in ambos_total)){
+                              ambos_total[id_producto] = {'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario'], 'cantidad':0};
+                          }
+                          ambos_total[id_producto]['cantidad'] += d_tipo_promocion[id_promo][id_producto]['ambos'];
+                          // console.log('elif')
+                          // console.log(id_producto)
+                          // console.log(d_tipo_promocion[id_promo][id_producto]['ambos'])
+                          // console.log(d_tipo_promocion[id_promo][id_producto])
+                          // console.log(ambos_total)
                         }
-                        ambos_total[id_producto]['cantidad'] += d_tipo_promocion[id_promo][id_producto]['ambos'];
-                        // console.log('elif')
-                        // console.log(id_producto)
-                        // console.log(d_tipo_promocion[id_promo][id_producto]['ambos'])
-                        // console.log(d_tipo_promocion[id_promo][id_producto])
-                        // console.log(ambos_total)
                     }
 
 
-                    console.log('000------------')
+                    // console.log('000------------')
                     // console.log(promocion_total)
                     // console.log(info_a_partir)
                     // console.log(beneficio_total['cantidad'])
                     // console.log(info_cantidad_promocion)
-                    console.log(ambos_total)
+                    // console.log(ambos_total)
+                    // console.log(Object.keys(ambos_total).length)
                     if (Object.keys(ambos_total).length > 0){
                         // console.log('p1')
                         // console.log(promocion_total)
@@ -1816,8 +1834,14 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                             // las cantidades que en realidad existen
                             Object.keys(ambos_total).forEach(function(producto_ambos) {
                                 if((ambos_total[producto_ambos]['cantidad'] > 0) ){
+                                    // console.log('OBJECT CANTIDAD SUMAN')
                                     cantidad_sumar += ambos_total[producto_ambos]['cantidad'];
+                                    // console.log(cantidad_sumar)
+                                    // console.log(ambos_total[producto_ambos])
                                     ambos_total[producto_ambos]['cantidad'] -= (info_a_partir - promocion_total);
+                                    // delete (ambos_total.producto_ambos);
+                                    //Eliminamos la llave o id producto para que adelante no afecte (hay casos en el que cantidad queda cero)
+                                    // delete ambos_total[producto_ambos];
                                     return;
                                 }
                             });
@@ -1828,19 +1852,27 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                         }
 
-                        if (beneficio_total['cantidad'] < info_cantidad_promocion && cantidad_sumar > 0) {
-                            var cantidad_sumar = (info_cantidad_promocion - beneficio_total['cantidad'])
+                        // console.log('&&&&')
+                        // console.log(beneficio_total['cantidad'])
+                        // console.log(info_cantidad_promocion);
+                        if (beneficio_total['cantidad'] < info_cantidad_promocion && promocion_total > 0) {
+                            var cantidad_sumar_info = (info_cantidad_promocion - beneficio_total['cantidad'])
                             // console.log('*+++++++')
-
+                            // console.log(cantidad_sumar_info)
                             //Le quitamos la cantidad necesaria , para dejar los sobrantes
+                            // console.log(ambos_total)
                             Object.keys(ambos_total).forEach(function(producto_ambos) {
-                                if((ambos_total[producto_ambos]['cantidad'] >= cantidad_sumar) ){
-                                    beneficio_total['cantidad'] +=cantidad_sumar
+                                // console.log('OBJECT LOOP 2')
+                                // console.log(producto_ambos)
+                                // console.log(ambos_total[producto_ambos]['cantidad'])
+                                // console.log(cantidad_sumar_info)
+                                if((ambos_total[producto_ambos]['cantidad'] >= cantidad_sumar_info) ){
+                                    beneficio_total['cantidad'] +=cantidad_sumar_info
                                     beneficio_total = {'precio_unitario':   ambos_total[producto_ambos]['precio_unitario'] , 'cantidad':   ambos_total[producto_ambos]['cantidad']};
-                                    ambos_total[producto_ambos]['cantidad'] -= cantidad_sumar
+                                    ambos_total[producto_ambos]['cantidad'] -= cantidad_sumar_info
                                     // console.log('ASIGNANDO BENEFICIO TOTAL')
                                     // console.log(ambos_total)
-                                    return;
+                                    // return;
                                 }
                             });
                         }
@@ -1853,7 +1885,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                     // console.log(beneficio_total)
                     // console.log(info_cantidad_promocion)
                     if( promocion_total >= info_a_partir && beneficio_total['cantidad'] >= info_cantidad_promocion){
-                      console.log('segundo IF 33')
+                      // console.log('segundo IF 33')
                       while (promocion_total >= info_a_partir && beneficio_total['cantidad'] >= info_cantidad_promocion) {
                           promocion_total -= info_a_partir;
                           beneficio_total['cantidad'] -= info_cantidad_promocion;
