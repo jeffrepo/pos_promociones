@@ -3,34 +3,34 @@ odoo.define('pos_promociones.screens', function (require) {
 
 var screens = require('point_of_sale.screens');
 
-var PedidoEspecial = screens.ActionButtonWidget.extend({
-    template: 'PedidoEspecial',
-    init: function(parent, options) {
-        this._super(parent, options);
-        this.pos.bind('change:selectedOrder',this.renderElement,this);
-    },
-    button_click: function(){
-        var self = this;
-        var order = this.pos.get_order();
-        var gui = this.pos.gui;
-
-        order.pedido_especial = !order.pedido_especial;
-
-        var set_especial = this.pos.set_pedidoEspecial(order.pedido_especial);
-        var get_especial = this.pos.get_pedidoEspecial();
-        this.renderElement();
-
-    },
-
-});
-
-screens.define_action_button({
-    'name': 'pedidoespecial',
-    'widget': PedidoEspecial,
-    'condition': function(){
-        return this.pos.config.pedido_especial;
-    },
-});
+// var PedidoEspecial = screens.ActionButtonWidget.extend({
+//     template: 'PedidoEspecial',
+//     init: function(parent, options) {
+//         this._super(parent, options);
+//         this.pos.bind('change:selectedOrder',this.renderElement,this);
+//     },
+//     button_click: function(){
+//         var self = this;
+//         var order = this.pos.get_order();
+//         var gui = this.pos.gui;
+//
+//         order.pedido_especial = !order.pedido_especial;
+//
+//         var set_especial = this.pos.set_pedidoEspecial(order.pedido_especial);
+//         var get_especial = this.pos.get_pedidoEspecial();
+//         this.renderElement();
+//
+//     },
+//
+// });
+//
+// screens.define_action_button({
+//     'name': 'pedidoespecial',
+//     'widget': PedidoEspecial,
+//     'condition': function(){
+//         return this.pos.config.pedido_especial;
+//     },
+// });
 
 
 var PedidoLinea = screens.ActionButtonWidget.extend({
@@ -210,6 +210,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'cantidad_descuento':0,
                       'total_descuento': [],
                       'n_promocion': [],
+                      'ids_lineas':[],
                       'estado': false,
                       'estado_cantidades':false,
                     };
@@ -231,6 +232,8 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                   }
 
                   if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
+                    console.log("Si es este Geordie :D");
+                    console.log(diccionario_productos_descuento[l.product.id]);
                     if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
                       if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
                         diccionario_productos_descuento[l.product.id]['cantidad'] +=l.get_quantity();
@@ -354,6 +357,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'cantidad_descuento':0,
                       'total_descuento': [],
                       'n_promocion': [],
+                      'ids_lineas':[],
                       'estado': false,
                       'estado_cantidades':false,
                     };
@@ -419,6 +423,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
   										'cantidad_descuento':0,
                       'total_descuento':[],
                       'n_promocion': [],
+                      'ids_lineas':[],
                       'estado': false,
                       'estado_cantidades': false,
   									};
@@ -439,7 +444,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                     }
 
                   }
-                  console.log("Geordie estoy aquí 3");
+
                   if (l.product.id == diccionario_productos_descuento[l.product.id]['id']) {
                     if (diccionario_productos_descuento[l.product.id]['ids_lineas'].length <= 0) {
                       if (!(l.id in diccionario_productos_descuento[l.product.id]['ids_lineas'])) {
@@ -558,7 +563,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                       }
                     }
-                    console.log("Promos 0");
+
                     if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
                       diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
                         'productos_regalo_ids': [],
@@ -628,7 +633,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'lineas_ids': [],
                       }
                     }
-                    console.log("Promos 1");
+
                     if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
                       diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
                         'productos_regalo_ids': [],
@@ -713,7 +718,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       }
                     }
 
-                    console.log("Promos 2");
+
                     if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
                       diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
                         'productos_regalo_ids': [],
@@ -786,7 +791,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                       'n_promocion_ids':[],
                       }
                     }
-                    console.log("Promos 3");
+
                     if (!(promociones[i].pos_condicion_promocion_ids[0]['id'] in diccionario_producto_regalo_promocion)) {
                       diccionario_producto_regalo_promocion[promociones[i].pos_condicion_promocion_ids[0]['id']]={
                         'productos_regalo_ids': [],
@@ -886,8 +891,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
     var d_tipo_promocion = {};
     var d_tipo_descuento = {};
 
-    // console.log('condiciones inicio')
-    // console.log(promociones)
 
     //informacion de tipo promocion sobre apartir, descuento y regalo
     var info_tipo_promocion = {}
@@ -1052,9 +1055,6 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
         }else{
           console.log(".");
-          // console.log("Productos que no estan en las dos promociones ");
-          // console.log(l.product.display_name);
-          // console.log(l.product.id);
 
         }
 
@@ -1064,8 +1064,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
           if (l.product.id in diccionario_productos) {
 
             if (diccionario_productos[l.product.id]['n_promocion_ids'].length > 1) {
-                // console.log('entra por tener 2 promos')
-                // console.log(condicion[0]['id']);
+
               if (diccionario_productos[l.product.id]['n_promocion_ids'].includes(condicion[0]['id']) ) {
 
                 if (diccionario_productos[l.product.id]['listado_regalos'][condicion[0]['id']]['lista_productos_ids'].includes(l.product.id)) { // Si el producto esta en la parte de promocion y de regalo hace todo el proceso
@@ -1692,9 +1691,7 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
 			}
 		});
-    console.log('-INICIO DE TIPO PROMOCION-')
-    console.log(d_tipo_promocion)
-    // console.log(d_tipo_descuento)
+
     var combinaciones = {}
 
     //¿Viene con info d_tipo_promocion?
@@ -1719,13 +1716,9 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                 //SI TIENE PRODUCTOS RECORREMOS PARA VER LOS PRODUCTOS
                 Object.keys(d_tipo_promocion[id_promo]).forEach(function(id_producto) {
-                    // console.log('Inicio producto')
-                    // console.log(id_producto)
-                    // console.log('poromcion total inicio: ' + (promocion_total.toString()))
                     if (d_tipo_promocion[id_promo][id_producto]['beneficio'] >0){
                         beneficio_total = {'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario'] , 'cantidad': d_tipo_promocion[id_promo][id_producto]['beneficio']};
-                        // console.log('beneficio_total')
-                        // console.log(beneficio_total)
+
                     }else{
                         if (d_tipo_promocion[id_promo][id_producto]['ambos'] >= (info_a_partir + info_cantidad_promocion) && promocion_total > 0){
                             d_tipo_promocion[id_promo][id_producto]['ambos']  -= info_cantidad_promocion
@@ -1737,40 +1730,23 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
 
                     if (d_tipo_promocion[id_promo][id_producto]['promocion'] >0){
                         promocion_total += d_tipo_promocion[id_promo][id_producto]['promocion'];
-                        // console.log('Contiene promocion');
-                        // console.log(promocion_total)
+
                     }
-
-                    // console.log('AMBOS ' + id_promo.toString())
-                    // console.log(d_tipo_promocion[id_promo][id_producto]['ambos'])
-                    // console.log(info_a_partir)
-                    // console.log()
-
 
 
                     if (d_tipo_promocion[id_promo][id_producto]['ambos'] >= (info_a_partir + info_cantidad_promocion) && promocion_total == 0){
                         var descuentos =  Math.trunc(d_tipo_promocion[id_promo][id_producto]['ambos'] /(info_a_partir + info_cantidad_promocion))
                         sobrante = d_tipo_promocion[id_promo][id_producto]['ambos'] - (descuentos * (info_a_partir + info_cantidad_promocion))
-                        // console.log('descuentos')
-                        // console.log(descuentos)
-                        // console.log('sobrante')
-                        // console.log(sobrante)
 
                         if (sobrante > 0){
                             if (!(id_producto in ambos_total)){
                                 ambos_total[id_producto] = {'cantidad': 0, 'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario']};
                             }
                             ambos_total[id_producto]['cantidad'] += sobrante;
-                            // console.log('ambos_total')
-                            // console.log(ambos_total)
                         }
                         var descuento_push = 0;
                         descuento_push = (descuentos * d_tipo_promocion[id_promo][id_producto]['precio_unitario'])*(info_porcentaje/100)
 
-                        // console.log('descuento_push')
-                        // console.log(descuentos)
-                        // console.log(d_tipo_promocion[id_promo][id_producto]['precio_unitario'])
-                        // console.log(descuento_push)
                         if(descuento_push > 0){
 
                             //verificamos si no exista la promocion en COMIBNACIONES PARA LLENAR CON PRODUCTOS Y DESCUENTOS
@@ -1790,17 +1766,11 @@ var ButtonPromocion = screens.ActionButtonWidget.extend({
                     }else {
                         if (d_tipo_promocion[id_promo][id_producto]['ambos'] > 0) {
 
-                          // console.log('AMBOS ANTES')
-                          // console.log(ambos_total)
                           if (!(id_producto in ambos_total)){
                               ambos_total[id_producto] = {'precio_unitario': d_tipo_promocion[id_promo][id_producto]['precio_unitario'], 'cantidad':0};
                           }
                           ambos_total[id_producto]['cantidad'] += d_tipo_promocion[id_promo][id_producto]['ambos'];
-                          // console.log('elif')
-                          // console.log(id_producto)
-                          // console.log(d_tipo_promocion[id_promo][id_producto]['ambos'])
-                          // console.log(d_tipo_promocion[id_promo][id_producto])
-                          // console.log(ambos_total)
+
                         }
                     }
 

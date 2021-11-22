@@ -14,7 +14,7 @@
       </t>
     </t>
 
-    <t t-name="PedidoEspecial">
+    <!-- <t t-name="PedidoEspecial">
         <t t-if="widget.pos.get_order() &amp;&amp; !widget.pos.get_order().pedido_especial">
           <div class="control-button js_promocionesEspeciales">
             <i class='fa fa-shopping-bag'/> Pedido especial
@@ -25,7 +25,7 @@
             <i class='fa fa-shopping-bag'/> Pedido especial seleccionado
           </div>
         </t>
-    </t>
+    </t> -->
 
     <t t-name="ButtonPromocion">
       <div class="control-button js_promocionesEspeciales">

@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
           <field name="crm_team_id" position="after">
             <group>
-              <field name="pedido_especial"/>
+              <!-- <field name="pedido_especial"/> -->
               <field name="pedido_linea"/>
             </group>
             <group>

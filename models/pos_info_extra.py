@@ -7,7 +7,5 @@ import pytz
 class PosInfoExtra(models.Model):
     _inherit = 'pos.order'
 
-    pedido_especial = fields.Boolean(string="Pedido especial")
+    # pedido_especial = fields.Boolean(string="Pedido especial")
     pedido_linea = fields.Boolean(string="Pedido de linea")
-
-    

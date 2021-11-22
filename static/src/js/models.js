@@ -49,7 +49,7 @@ models.load_models({
 					var fecha_promo_fin0 = moment(fecha_promo_fin).utc().local().format("DD-MM-YYYY");
 
 					if ((fecha_sesion0 >= fecha_promo_inicio) && (fecha_sesion0 <= fecha_promo_final)){
-						
+
 						var posicion = pos_promocion;
 						var promocion_i = pos_promocion;
 
@@ -128,7 +128,7 @@ models.PosModel = models.PosModel.extend({
   add_new_order: function(){
       var new_order = _super_posmodel.add_new_order.apply(this);
       this.set('pedido_linea', false);
-      this.set('pedido_especial', false);
+      // this.set('pedido_especial', false);
     },
     set_pedidoLinea: function(pedido_linea){
       this.set('pedido_linea', pedido_linea);
@@ -137,13 +137,13 @@ models.PosModel = models.PosModel.extend({
       return this.get('pedido_linea');
     },
 
-    set_pedidoEspecial: function(pedido_especial){
-      this.set('pedido_especial', pedido_especial);
-    },
+    // set_pedidoEspecial: function(pedido_especial){
+    //   this.set('pedido_especial', pedido_especial);
+    // },
 
-    get_pedidoEspecial: function(){
-      return this.get('pedido_especial');
-    },
+    // get_pedidoEspecial: function(){
+    //   return this.get('pedido_especial');
+    // },
 
 })
 
@@ -557,7 +557,7 @@ models.Orderline = models.Orderline.extend({
 models.Order = models.Order.extend({
   export_as_JSON : function(){
     var new_json = _super_order.export_as_JSON.apply(this);
-    new_json['pedido_especial'] = this.pos.get_pedidoEspecial() ? this.pos.get_pedidoEspecial() : false;
+    //new_json['pedido_especial'] = this.pos.get_pedidoEspecial() ? this.pos.get_pedidoEspecial() : false;
     new_json['pedido_linea'] = this.pos.get_pedidoLinea() ? this.pos.get_pedidoLinea() : false;
 
     return new_json;
