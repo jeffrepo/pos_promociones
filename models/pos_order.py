@@ -28,8 +28,8 @@ class PosOrder(models.Model):
         if session.config_id.pedido_linea:
             res['pedido_linea']=ui_order['pedido_linea']
 
-        if session.config_id.pedido_especial:
-            res['pedido_especial']=ui_order['pedido_especial']
+        # if session.config_id.pedido_especial:
+        #     res['pedido_especial']=ui_order['pedido_especial']
 
         return res
 
